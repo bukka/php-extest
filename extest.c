@@ -24,11 +24,14 @@
 
 #include "php.h"
 #include "php_extest.h"
+#include "php_extest_serialize.h"
 
 /* {{{ PHP_MINIT_FUNCTION
  */
 PHP_MINIT_FUNCTION(extest)
 {
+	PHP_MINIT(extest_serialize)(INIT_FUNC_ARGS_PASSTHRU);
+
 	return SUCCESS;
 }
 /* }}} */

@@ -16,35 +16,13 @@
    +----------------------------------------------------------------------+
 */
 
-#include "php.h"
-#include "php_extest.h"
+#ifndef PHP_EXTEST_SERIALIZE_H
+#define PHP_EXTEST_SERIALIZE_H
 
-PHP_EXTEST_API zend_class_entry *extest_serialize_existing_ce;
-PHP_EXTEST_API zend_class_entry *extest_serialize_virtual_ce;
-PHP_EXTEST_API zend_class_entry *extest_serialize_custom_ce;
+PHP_MINIT_FUNCTION(extest_serialize);
 
+#endif	/* PHP_EXTEST_H */
 
-/* {{{ PHP_MINIT_FUNCTION */
-PHP_MINIT_FUNCTION(extest_serialize)
-{
-	zend_class_entry ce;
-
-	/* Default serialization of object properties */
-	INIT_CLASS_ENTRY(ce, "ExtestSerializeReal", NULL);
-	extest_serialize_existing_ce = zend_register_internal_class(&ce TSRMLS_CC);
-	zend_declare_property_null(extest_serialize_existing_ce, "algorithm", sizeof("algorithm")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
-
-	/* Serailization of object properties */
-	INIT_CLASS_ENTRY(ce, "ExtestSerializeVirtual", NULL);
-	extest_serialize_existing_ce = zend_register_internal_class(&ce TSRMLS_CC);
-
-	/* Custom serialization using new API */
-	INIT_CLASS_ENTRY(ce, "ExtestSerializeCustom", NULL);
-	extest_serialize_existing_ce = zend_register_internal_class(&ce TSRMLS_CC);
-
-	return SUCCESS;
-}
-/* }}} */
 
 /*
  * Local variables:
