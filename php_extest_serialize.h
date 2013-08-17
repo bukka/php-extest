@@ -21,6 +21,10 @@
 
 PHP_MINIT_FUNCTION(extest_serialize);
 
+PHP_METHOD(ExtestSerialize, __construct);
+PHP_METHOD(ExtestSerialize, setExam);
+PHP_METHOD(ExtestSerialize, getExam);
+
 #endif	/* PHP_EXTEST_H */
 
 
