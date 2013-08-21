@@ -24,6 +24,7 @@
 
 typedef struct {
 	zend_object zo;
+	HashTable *props;
 	int exam;
 } extest_serialize_object;
 
@@ -101,7 +102,7 @@ static zend_object_value extest_serialize_object_create(zend_class_entry *class_
 /* }}} */
 
 /* {{{ extest_serialize_object_clone */
-zend_object_value extest_serialize_object_clone(zval *this_ptr TSRMLS_DC)
+static zend_object_value extest_serialize_object_clone(zval *this_ptr TSRMLS_DC)
 {
 	extest_serialize_object *new_obj = NULL;
 	extest_serialize_object *old_obj = (extest_serialize_object *) zend_object_store_get_object(this_ptr TSRMLS_CC);
@@ -110,6 +111,39 @@ zend_object_value extest_serialize_object_clone(zval *this_ptr TSRMLS_DC)
 	zend_objects_clone_members(&new_obj->zo, new_ov, &old_obj->zo, Z_OBJ_HANDLE_P(this_ptr) TSRMLS_CC);
 
 	return new_ov;
+}
+/* }}} */
+
+/* {{{ extest_serialize_set_properties */
+static void extest_serialize_set_properties(HashTable **pprops, int exam, int destroy)
+{
+
+	zval *value;
+
+	if (!*pprops) {
+		ALLOC_HASHTABLE(*pprops);
+		zend_hash_init(*pprops, 0, NULL, ZVAL_PTR_DTOR, 0);
+	} else if (destroy) {
+		zend_hash_destroy(*pprops);
+	}
+
+	switch (exam) {
+		case 0:
+			MAKE_STD_ZVAL(value);
+			ZVAL_STRING(value, "value", 1);
+			zend_hash_update(*pprops, "key", sizeof("key"), (void *) pprops, sizeof(zval *), NULL);
+			break;
+	}
+
+}
+/* }}} */
+
+/* {{{ extest_serialize_set_properties */
+static HashTable *extest_serialize_get_properties(zval *object TSRMLS_DC)
+{
+	extest_serialize_object *intern = (extest_serialize_object *) zend_object_store_get_object(object TSRMLS_CC);
+	extest_serialize_set_properties(&intern->zo.properties, intern->exam, 0);
+	return intern->zo.properties;
 }
 /* }}} */
 
@@ -138,6 +172,7 @@ PHP_MINIT_FUNCTION(extest_serialize)
 	ce.create_object = extest_serialize_object_create;
 	memcpy(&extest_serialize_virtual_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 	extest_serialize_virtual_object_handlers.clone_obj = extest_serialize_object_clone;
+	extest_serialize_virtual_object_handlers.get_properties = extest_serialize_get_properties;
 	extest_serialize_existing_ce = zend_register_internal_class_ex(&ce, extest_serialize_ce, NULL TSRMLS_CC);
 
 	/* Custom serialization using new API */
