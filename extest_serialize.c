@@ -40,14 +40,14 @@ static const zend_function_entry extest_serialize_methods[] = {
 };
 
 PHP_EXTEST_API zend_class_entry *extest_serialize_ce;
-PHP_EXTEST_API zend_class_entry *extest_serialize_existing_ce;
-PHP_EXTEST_API zend_class_entry *extest_serialize_virtual_ce;
+PHP_EXTEST_API zend_class_entry *extest_serialize_static_ce;
+PHP_EXTEST_API zend_class_entry *extest_serialize_dynamic_ce;
 PHP_EXTEST_API zend_class_entry *extest_serialize_custom_ce;
 
 /* object handlers */
 static zend_object_handlers extest_serialize_object_handlers;
-static zend_object_handlers extest_serialize_existing_object_handlers;
-static zend_object_handlers extest_serialize_virtual_object_handlers;
+static zend_object_handlers extest_serialize_static_object_handlers;
+static zend_object_handlers extest_serialize_dynamic_object_handlers;
 static zend_object_handlers extest_serialize_custom_object_handlers;
 
 /* {{{ extest_serialize_object_free */
@@ -72,12 +72,11 @@ static zend_object_value extest_serialize_object_create_ex(zend_class_entry *cla
 		*ptr = intern;
 	}
 	zend_object_std_init(&intern->zo, class_type TSRMLS_CC);
-	object_properties_init(&intern->zo, class_type);
 
-	if (class_type == extest_serialize_existing_ce) {
-		retval.handlers = &extest_serialize_existing_object_handlers;
-	} else if (class_type == extest_serialize_virtual_ce) {
-		retval.handlers = &extest_serialize_virtual_object_handlers;
+	if (class_type == extest_serialize_static_ce) {
+		retval.handlers = &extest_serialize_static_object_handlers;
+	} else if (class_type == extest_serialize_dynamic_ce) {
+		retval.handlers = &extest_serialize_dynamic_object_handlers;
 	} else if (class_type == extest_serialize_custom_ce) {
 		retval.handlers = &extest_serialize_custom_object_handlers;
 	} else {
@@ -114,25 +113,64 @@ static zend_object_value extest_serialize_object_clone(zval *this_ptr TSRMLS_DC)
 }
 /* }}} */
 
+static inline int extest_serialize_propset_string(const char *key, char *value, zend_object *zo) {
+	zval *tmp;
+	MAKE_STD_ZVAL(tmp);
+	ZVAL_STRING(tmp, value, 1);
+	zend_hash_update(zo->properties, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
+}
+
+static inline int extest_serialize_propset_long(const char *key, long value, zend_object *zo) {
+	zval *tmp;
+	MAKE_STD_ZVAL(tmp);
+	ZVAL_LONG(tmp, value);
+	zend_hash_update(zo->properties, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
+}
+
+static inline int extest_serialize_propset_double(const char *key, double value, zend_object *zo) {
+	zval *tmp;
+	MAKE_STD_ZVAL(tmp);
+	ZVAL_DOUBLE(tmp, value);
+	zend_hash_update(zo->properties, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
+}
+
 /* {{{ extest_serialize_set_properties */
-static void extest_serialize_set_properties(HashTable **pprops, int exam, int destroy)
+static void extest_serialize_set_properties(zend_object *zo, int exam, int destroy)
 {
-
-	zval *value;
-
-	if (!*pprops) {
-		ALLOC_HASHTABLE(*pprops);
-		zend_hash_init(*pprops, 0, NULL, ZVAL_PTR_DTOR, 0);
-	} else if (destroy) {
-		zend_hash_destroy(*pprops);
+	if (destroy || !zo->properties) {
+		if (zo->properties) {
+			zend_hash_destroy(zo->properties);
+		} else {
+			ALLOC_HASHTABLE(zo->properties);
+		}
+		zend_hash_init(zo->properties, 0, NULL, ZVAL_PTR_DTOR, 0);
 	}
 
 	switch (exam) {
 		case 0:
-			MAKE_STD_ZVAL(value);
-			ZVAL_STRING(value, "value", 1);
-			zend_hash_update(*pprops, "key", sizeof("key"), (void *) pprops, sizeof(zval *), NULL);
+			extest_serialize_propset_string("key", "value", zo);
 			break;
+
+		case 1:
+			extest_serialize_propset_string("key1", "value1", zo);
+			extest_serialize_propset_string("key2", "value2", zo);
+			extest_serialize_propset_string("key3", "value3", zo);
+			extest_serialize_propset_string("key4", "value4", zo);
+			extest_serialize_propset_string("key5", "value5", zo);
+			break;
+
+		case 2:
+			extest_serialize_propset_long("key1", 1, zo);
+			extest_serialize_propset_long("key2", 2, zo);
+			extest_serialize_propset_long("key3", 3, zo);
+			extest_serialize_propset_long("key4", 4, zo);
+			extest_serialize_propset_long("key5", -5, zo);
+			break;
+
+		case 3:
+			extest_serialize_propset_double("key1", 1.1, zo);
+			extest_serialize_propset_double("key1", 1.2, zo);
+			extest_serialize_propset_double("key1", -1.3, zo);
 	}
 
 }
@@ -142,7 +180,7 @@ static void extest_serialize_set_properties(HashTable **pprops, int exam, int de
 static HashTable *extest_serialize_get_properties(zval *object TSRMLS_DC)
 {
 	extest_serialize_object *intern = (extest_serialize_object *) zend_object_store_get_object(object TSRMLS_CC);
-	extest_serialize_set_properties(&intern->zo.properties, intern->exam, 0);
+	extest_serialize_set_properties(&intern->zo, intern->exam, 0);
 	return intern->zo.properties;
 }
 /* }}} */
@@ -160,27 +198,27 @@ PHP_MINIT_FUNCTION(extest_serialize)
 	extest_serialize_ce = zend_register_internal_class(&ce TSRMLS_CC);
 
 	/* Default serialization of object properties */
-	INIT_CLASS_ENTRY(ce, "ExtestSerializeReal", NULL);
+	INIT_CLASS_ENTRY(ce, "ExtestSerializeS", NULL);
 	ce.create_object = extest_serialize_object_create;
-	memcpy(&extest_serialize_existing_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
-	extest_serialize_existing_object_handlers.clone_obj = extest_serialize_object_clone;
-	extest_serialize_existing_ce = zend_register_internal_class_ex(&ce, extest_serialize_ce, NULL TSRMLS_CC);
-	zend_declare_property_null(extest_serialize_existing_ce, "algorithm", sizeof("algorithm")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+	memcpy(&extest_serialize_static_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
+	extest_serialize_static_object_handlers.clone_obj = extest_serialize_object_clone;
+	extest_serialize_static_ce = zend_register_internal_class_ex(&ce, extest_serialize_ce, NULL TSRMLS_CC);
+	zend_declare_property_null(extest_serialize_static_ce, "algorithm", sizeof("algorithm")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 
 	/* Serailization of object properties */
-	INIT_CLASS_ENTRY(ce, "ExtestSerializeVirtual", NULL);
+	INIT_CLASS_ENTRY(ce, "ExtestSerializeD", NULL);
 	ce.create_object = extest_serialize_object_create;
-	memcpy(&extest_serialize_virtual_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
-	extest_serialize_virtual_object_handlers.clone_obj = extest_serialize_object_clone;
-	extest_serialize_virtual_object_handlers.get_properties = extest_serialize_get_properties;
-	extest_serialize_existing_ce = zend_register_internal_class_ex(&ce, extest_serialize_ce, NULL TSRMLS_CC);
+	memcpy(&extest_serialize_dynamic_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
+	extest_serialize_dynamic_object_handlers.clone_obj = extest_serialize_object_clone;
+	extest_serialize_dynamic_object_handlers.get_properties = extest_serialize_get_properties;
+	extest_serialize_dynamic_ce = zend_register_internal_class_ex(&ce, extest_serialize_ce, NULL TSRMLS_CC);
 
 	/* Custom serialization using new API */
-	INIT_CLASS_ENTRY(ce, "ExtestSerializeCustom", NULL);
+	INIT_CLASS_ENTRY(ce, "ExtestSerializeC", NULL);
 	ce.create_object = extest_serialize_object_create;
 	memcpy(&extest_serialize_custom_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 	extest_serialize_custom_object_handlers.clone_obj = extest_serialize_object_clone;
-	extest_serialize_existing_ce = zend_register_internal_class_ex(&ce, extest_serialize_ce, NULL TSRMLS_CC);
+	extest_serialize_static_ce = zend_register_internal_class_ex(&ce, extest_serialize_ce, NULL TSRMLS_CC);
 
 	/* Number of exams */
 	REGISTER_LONG_CONSTANT("EXTEST_NUM_EXAMS", EXTEST_NUM_EXAMS, CONST_CS | CONST_PERSISTENT);
@@ -201,6 +239,7 @@ static int extest_serialize_set_exam(INTERNAL_FUNCTION_PARAMETERS)
 
 	intern = (extest_serialize_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 	intern->exam = exam;
+	extest_serialize_set_properties(&intern->zo, exam, 1);
 	return SUCCESS;
 }
 /* }}} */
