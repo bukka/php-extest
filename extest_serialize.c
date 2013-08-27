@@ -19,8 +19,10 @@
 #include "php.h"
 #include "php_extest.h"
 #include "php_extest_serialize.h"
+#include "ext/standard/php_smart_str.h"
+#include "ext/standard/php_var.h"
 
-#define EXTEST_NUM_EXAMS 5
+#define EXTEST_NUM_EXAMS 4
 
 typedef struct {
 	zend_object zo;
@@ -169,14 +171,15 @@ static void extest_serialize_set_properties(zend_object *zo, int exam, int destr
 
 		case 3:
 			extest_serialize_propset_double("key1", 1.1, zo);
-			extest_serialize_propset_double("key1", 1.2, zo);
-			extest_serialize_propset_double("key1", -1.3, zo);
+			extest_serialize_propset_double("key2", 1.2, zo);
+			extest_serialize_propset_double("key3", -1.3, zo);
+			break;
 	}
 
 }
 /* }}} */
 
-/* {{{ extest_serialize_set_properties */
+/* {{{ extest_serialize_get_properties */
 static HashTable *extest_serialize_get_properties(zval *object TSRMLS_DC)
 {
 	extest_serialize_object *intern = (extest_serialize_object *) zend_object_store_get_object(object TSRMLS_CC);
@@ -184,6 +187,55 @@ static HashTable *extest_serialize_get_properties(zval *object TSRMLS_DC)
 	return intern->zo.properties;
 }
 /* }}} */
+
+/* {{{ extest_serialize_custom_callback */
+static int extest_serialize_custom_callback(zval *object, unsigned char **buffer, zend_uint *buf_len, zend_serialize_data *data TSRMLS_DC)
+{
+	extest_serialize_object *intern = (extest_serialize_object *) zend_object_store_get_object(object TSRMLS_CC);
+	smart_str buf = {0};
+
+	switch (intern->exam) {
+		case 0:
+			php_var_serialize_object_start(&buf, object, 1 TSRMLS_CC);
+			php_var_serialize_property_string(&buf, "key", "value");
+			php_var_serialize_object_end(&buf);
+			break;
+
+		case 1:
+			php_var_serialize_object_start(&buf, object, 5 TSRMLS_CC);
+			php_var_serialize_property_string(&buf, "key1", "value1");
+			php_var_serialize_property_string(&buf, "key2", "value2");
+			php_var_serialize_property_string(&buf, "key3", "value3x");
+			php_var_serialize_property_string(&buf, "key4", "value4");
+			php_var_serialize_property_string(&buf, "key5", "value5");
+			php_var_serialize_object_end(&buf);
+			break;
+
+		case 2:
+			php_var_serialize_object_start(&buf, object, 5 TSRMLS_CC);
+			php_var_serialize_property_long(&buf, "key1", 1);
+			php_var_serialize_property_long(&buf, "key2", 2);
+			php_var_serialize_property_long(&buf, "key3", 3);
+			php_var_serialize_property_long(&buf, "key4", 4);
+			php_var_serialize_property_long(&buf, "key5", -5);
+			php_var_serialize_object_end(&buf);
+			break;
+
+		case 3:
+			php_var_serialize_object_start(&buf, object, 3 TSRMLS_CC);
+			php_var_serialize_property_double(&buf, "key1", 1.1 TSRMLS_CC);
+			php_var_serialize_property_double(&buf, "key2", 1.2 TSRMLS_CC);
+			php_var_serialize_property_double(&buf, "key3", -1.3 TSRMLS_CC);
+			php_var_serialize_object_end(&buf);
+			break;
+	}
+
+	smart_str_0(&buf);
+	*buffer = buf.c;
+	*buf_len = buf.len;
+
+	return PHP_SERIALIZE_OBJECT;
+}
 
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(extest_serialize)
@@ -216,6 +268,7 @@ PHP_MINIT_FUNCTION(extest_serialize)
 	/* Custom serialization using new API */
 	INIT_CLASS_ENTRY(ce, "ExtestSerializeC", NULL);
 	ce.create_object = extest_serialize_object_create;
+	ce.serialize = extest_serialize_custom_callback;
 	memcpy(&extest_serialize_custom_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 	extest_serialize_custom_object_handlers.clone_obj = extest_serialize_object_clone;
 	extest_serialize_static_ce = zend_register_internal_class_ex(&ce, extest_serialize_ce, NULL TSRMLS_CC);
