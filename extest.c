@@ -25,6 +25,9 @@
 #include "php.h"
 #include "php_extest.h"
 #include "php_extest_serialize.h"
+#include "ext/standard/info.h"
+
+ZEND_DECLARE_MODULE_GLOBALS(extest)
 
 /* {{{ PHP_MINIT_FUNCTION
  */

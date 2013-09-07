@@ -35,9 +35,11 @@ ZEND_ARG_INFO(0, exam)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry extest_serialize_methods[] = {
-	PHP_ME(ExtestSerialize, __construct, arginfo_extest_serialize_exam, ZEND_ACC_CTOR|ZEND_ACC_PUBLIC)
-	PHP_ME(ExtestSerialize, setExam, arginfo_extest_serialize_exam, ZEND_ACC_PUBLIC)
-	PHP_ME(ExtestSerialize, getExam, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(ExtestSerialize, __construct,   arginfo_extest_serialize_exam,  ZEND_ACC_CTOR|ZEND_ACC_PUBLIC)
+	PHP_ME(ExtestSerialize, setExam,       arginfo_extest_serialize_exam,  ZEND_ACC_PUBLIC)
+	PHP_ME(ExtestSerialize, getExam,       NULL,                           ZEND_ACC_PUBLIC)
+	PHP_ME(ExtestSerialize, setGlobalExam, arginfo_extest_serialize_exam,  ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(ExtestSerialize, getGlobalExam, NULL,                           ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -115,26 +117,32 @@ static zend_object_value extest_serialize_object_clone(zval *this_ptr TSRMLS_DC)
 }
 /* }}} */
 
-static inline int extest_serialize_propset_string(const char *key, char *value, zend_object *zo) {
+/* {{{ extest_serialize_propset_string */
+static inline void extest_serialize_propset_string(const char *key, char *value, zend_object *zo) {
 	zval *tmp;
 	MAKE_STD_ZVAL(tmp);
 	ZVAL_STRING(tmp, value, 1);
 	zend_hash_update(zo->properties, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
 }
+/* }}} */
 
-static inline int extest_serialize_propset_long(const char *key, long value, zend_object *zo) {
+/* {{{ extest_serialize_propset_long */
+static inline void extest_serialize_propset_long(const char *key, long value, zend_object *zo) {
 	zval *tmp;
 	MAKE_STD_ZVAL(tmp);
 	ZVAL_LONG(tmp, value);
 	zend_hash_update(zo->properties, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
 }
+/* }}} */
 
-static inline int extest_serialize_propset_double(const char *key, double value, zend_object *zo) {
+/* {{{ extest_serialize_propset_double */
+static inline void extest_serialize_propset_double(const char *key, double value, zend_object *zo) {
 	zval *tmp;
 	MAKE_STD_ZVAL(tmp);
 	ZVAL_DOUBLE(tmp, value);
 	zend_hash_update(zo->properties, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
 }
+/* }}} */
 
 /* {{{ extest_serialize_set_properties */
 static void extest_serialize_set_properties(zend_object *zo, int exam, int destroy)
@@ -231,16 +239,94 @@ static int extest_serialize_custom_callback(zval *object, unsigned char **buffer
 	}
 
 	smart_str_0(&buf);
-	*buffer = buf.c;
+	*buffer = (unsigned char *) buf.c;
 	*buf_len = buf.len;
 
 	return PHP_SERIALIZE_OBJECT;
 }
+/* }}} */
+
+/* {{{ extest_unserialize_dump_property */
+static void extest_unserialize_dump_property(zval *key, zval *value) {
+	php_printf("Key: %s; Value: ", Z_STRVAL_P(key));
+	zend_print_zval(value, 0);
+	php_printf("\n");
+	zval_dtor(key);
+	zval_dtor(value);
+}
+/* }}} */
+
+/* {{{ extest_unserialize_custom_callback */
+static int extest_unserialize_custom_callback(zval **object, zend_class_entry *ce, const unsigned char *buf, zend_uint buf_len, zend_unserialize_data *data TSRMLS_DC)
+{
+	int i;
+	zval key, value;
+
+	switch (EXTEST_G(exam)) {
+		case 0:
+			if (php_var_unserialize_property(&key, &value, &buf, &buf_len, data TSRMLS_CC)) {
+				extest_unserialize_dump_property(&key, &value);
+			} else {
+				return -1;
+			}
+
+			break;
+
+		case 1:
+			for (i = 0; i < 5; i++) {
+				if (php_var_unserialize_property(&key, &value, &buf, &buf_len, data TSRMLS_CC)) {
+					extest_unserialize_dump_property(&key, &value);
+				} else {
+					return -1;
+				}
+			}
+			/*
+			php_var_serialize_object_start(&buf, object, 5 TSRMLS_CC);
+			php_var_serialize_property_string(&buf, "key1", "value1");
+			php_var_serialize_property_string(&buf, "key2", "value2");
+			php_var_serialize_property_string(&buf, "key3", "value3x");
+			php_var_serialize_property_string(&buf, "key4", "value4");
+			php_var_serialize_property_string(&buf, "key5", "value5");
+			php_var_serialize_object_end(&buf);
+			*/
+			break;
+
+		case 2:
+			for (i = 0; i < 5; i++) {
+				if (php_var_unserialize_property(&key, &value, &buf, &buf_len, data TSRMLS_CC)) {
+					extest_unserialize_dump_property(&key, &value);
+				} else {
+					return -1;
+				}
+			}
+			break;
+
+		case 3:
+			for (i = 0; i < 3; i++) {
+				if (php_var_unserialize_property(&key, &value, &buf, &buf_len, data TSRMLS_CC)) {
+					extest_unserialize_dump_property(&key, &value);
+				} else {
+					return -1;
+				}
+			}
+			break;
+	}
+
+	return (int) buf_len;
+}
+/* }}} */
 
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(extest_serialize)
 {
 	zend_class_entry ce;
+
+#ifdef ZTS
+	ts_allocate_id(&extest_globals_id, sizeof (zend_extest_globals), NULL, NULL);
+#endif
+
+	/* reset exam */
+	EXTEST_G(exam) = 0;
 
 	/* Default serialization of object properties */
 	INIT_CLASS_ENTRY(ce, "ExtestSerialize", extest_serialize_methods);
@@ -255,7 +341,6 @@ PHP_MINIT_FUNCTION(extest_serialize)
 	memcpy(&extest_serialize_static_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 	extest_serialize_static_object_handlers.clone_obj = extest_serialize_object_clone;
 	extest_serialize_static_ce = zend_register_internal_class_ex(&ce, extest_serialize_ce, NULL TSRMLS_CC);
-	zend_declare_property_null(extest_serialize_static_ce, "algorithm", sizeof("algorithm")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 
 	/* Serailization of object properties */
 	INIT_CLASS_ENTRY(ce, "ExtestSerializeD", NULL);
@@ -269,6 +354,7 @@ PHP_MINIT_FUNCTION(extest_serialize)
 	INIT_CLASS_ENTRY(ce, "ExtestSerializeC", NULL);
 	ce.create_object = extest_serialize_object_create;
 	ce.serialize = extest_serialize_custom_callback;
+	ce.unserialize = extest_unserialize_custom_callback;
 	memcpy(&extest_serialize_custom_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 	extest_serialize_custom_object_handlers.clone_obj = extest_serialize_object_clone;
 	extest_serialize_static_ce = zend_register_internal_class_ex(&ce, extest_serialize_ce, NULL TSRMLS_CC);
@@ -280,15 +366,29 @@ PHP_MINIT_FUNCTION(extest_serialize)
 }
 /* }}} */
 
+/* {{{ extest_serialize_read_exam */
+static int extest_serialize_read_exam(INTERNAL_FUNCTION_PARAMETERS, long default_exam)
+{
+	long exam = default_exam;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|l", &exam) == FAILURE) {
+		return default_exam;
+	}
+
+	if (exam < 0 || exam >= EXTEST_NUM_EXAMS) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Requested exam is out of range");
+		exam = default_exam;
+	}
+
+	return exam;
+}
+/* }}} */
+
 /* {{{ extest_serialize_set_exam */
 static int extest_serialize_set_exam(INTERNAL_FUNCTION_PARAMETERS)
 {
-	long exam = 0;
 	extest_serialize_object *intern;
-
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|l", &exam) == FAILURE || exam < 0 || exam >= EXTEST_NUM_EXAMS) {
-		return FAILURE;
-	}
+	long exam = extest_serialize_read_exam(INTERNAL_FUNCTION_PARAM_PASSTHRU, EXTEST_G(exam));
 
 	intern = (extest_serialize_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 	intern->exam = exam;
@@ -304,6 +404,7 @@ PHP_METHOD(ExtestSerialize, __construct)
 {
 	extest_serialize_set_exam(INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
+/* }}} */
 
 /* {{{ proto void ExtestSerialize::setExam(int exam)
    Sets exam */
@@ -311,14 +412,32 @@ PHP_METHOD(ExtestSerialize, setExam)
 {
 	RETURN_BOOL(extest_serialize_set_exam(INTERNAL_FUNCTION_PARAM_PASSTHRU) == SUCCESS);
 }
+/* }}} */
 
-/* {{{ proto int ExtestSerialize::getExam(int exam)
+/* {{{ proto int ExtestSerialize::getExam()
    Returns exam */
 PHP_METHOD(ExtestSerialize, getExam)
 {
 	extest_serialize_object *intern = (extest_serialize_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
 	RETURN_LONG(intern->exam);
 }
+/* }}} */
+
+/* {{{ proto void ExtestSerialize::setGlobalExam(int exam)
+   Sets global exam */
+PHP_METHOD(ExtestSerialize, setGlobalExam)
+{
+	EXTEST_G(exam) = extest_serialize_read_exam(INTERNAL_FUNCTION_PARAM_PASSTHRU, 0);
+}
+/* }}} */
+
+/* {{{ proto int ExtestSerialize::getExam()
+   Returns global exam */
+PHP_METHOD(ExtestSerialize, getGlobalExam)
+{
+	RETURN_LONG(EXTEST_G(exam));
+}
+/* }}} */
 
 /*
  * Local variables:
