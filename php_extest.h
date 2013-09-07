@@ -19,6 +19,8 @@
 #ifndef PHP_EXTEST_H
 #define PHP_EXTEST_H
 
+#include "php.h"
+
 extern zend_module_entry extest_module_entry;
 #define phpext_extest_ptr &extest_module_entry
 
@@ -40,10 +42,11 @@ ZEND_END_MODULE_GLOBALS(extest)
 
 #ifdef ZTS
 #define EXTEST_G(v) TSRMG(extest_globals_id, zend_extest_globals *, v)
-extern int extest_globals_id;
 #else
 #define EXTEST_G(v) (extest_globals.v)
 #endif
+
+ZEND_EXTERN_MODULE_GLOBALS(extest)
 
 #endif	/* PHP_EXTEST_H */
 

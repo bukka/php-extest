@@ -321,10 +321,6 @@ PHP_MINIT_FUNCTION(extest_serialize)
 {
 	zend_class_entry ce;
 
-#ifdef ZTS
-	ts_allocate_id(&extest_globals_id, sizeof (zend_extest_globals), NULL, NULL);
-#endif
-
 	/* reset exam */
 	EXTEST_G(exam) = 0;
 
