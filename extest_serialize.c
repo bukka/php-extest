@@ -117,11 +117,11 @@ static zend_object_value extest_serialize_object_clone(zval *this_ptr TSRMLS_DC)
 }
 /* }}} */
 
-/* {{{ extest_serialize_propset_string */
-static inline void extest_serialize_propset_string(const char *key, char *value, zend_object *zo) {
+/* {{{ extest_serialize_propset_long */
+static inline void extest_serialize_propset_bool(const char *key, int value, zend_object *zo) {
 	zval *tmp;
 	MAKE_STD_ZVAL(tmp);
-	ZVAL_STRING(tmp, value, 1);
+	ZVAL_BOOL(tmp, value);
 	zend_hash_update(zo->properties, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
 }
 /* }}} */
@@ -140,6 +140,15 @@ static inline void extest_serialize_propset_double(const char *key, double value
 	zval *tmp;
 	MAKE_STD_ZVAL(tmp);
 	ZVAL_DOUBLE(tmp, value);
+	zend_hash_update(zo->properties, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
+}
+/* }}} */
+
+/* {{{ extest_serialize_propset_string */
+static inline void extest_serialize_propset_string(const char *key, char *value, zend_object *zo) {
+	zval *tmp;
+	MAKE_STD_ZVAL(tmp);
+	ZVAL_STRING(tmp, value, 1);
 	zend_hash_update(zo->properties, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
 }
 /* }}} */
@@ -170,7 +179,7 @@ static void extest_serialize_set_properties(zend_object *zo, int exam, int destr
 			break;
 
 		case 2:
-			extest_serialize_propset_long("key1", 1, zo);
+			extest_serialize_propset_bool("key1", 1, zo);
 			extest_serialize_propset_long("key2", 2, zo);
 			extest_serialize_propset_long("key3", 3, zo);
 			extest_serialize_propset_long("key4", 4, zo);
@@ -213,7 +222,7 @@ static int extest_serialize_custom_callback(zval *object, unsigned char **buffer
 			php_var_serialize_object_start(&buf, object, 5 TSRMLS_CC);
 			php_var_serialize_property_string(&buf, "key1", "value1");
 			php_var_serialize_property_string(&buf, "key2", "value2");
-			php_var_serialize_property_string(&buf, "key3", "value3x");
+			php_var_serialize_property_stringl(&buf, "key3", "value3x", sizeof("value3x")-1);
 			php_var_serialize_property_string(&buf, "key4", "value4");
 			php_var_serialize_property_string(&buf, "key5", "value5");
 			php_var_serialize_object_end(&buf);
@@ -221,7 +230,7 @@ static int extest_serialize_custom_callback(zval *object, unsigned char **buffer
 
 		case 2:
 			php_var_serialize_object_start(&buf, object, 5 TSRMLS_CC);
-			php_var_serialize_property_long(&buf, "key1", 1);
+			php_var_serialize_property_bool(&buf, "key1", 1);
 			php_var_serialize_property_long(&buf, "key2", 2);
 			php_var_serialize_property_long(&buf, "key3", 3);
 			php_var_serialize_property_long(&buf, "key4", 4);
