@@ -22,7 +22,7 @@
 #include "ext/standard/php_smart_str.h"
 #include "ext/standard/php_var.h"
 
-#define EXTEST_NUM_EXAMS 4
+#define EXTEST_NUM_EXAMS 5
 
 typedef struct {
 	zend_object zo;
@@ -191,6 +191,17 @@ static void extest_serialize_set_properties(zend_object *zo, int exam, int destr
 			extest_serialize_propset_double("key2", 1.2, zo);
 			extest_serialize_propset_double("key3", -1.3, zo);
 			break;
+
+		case 4:
+			extest_serialize_propset_string("zstring", "test", zo);
+			extest_serialize_propset_bool("zbool", 1, zo);
+			extest_serialize_propset_long("zlong", 23, zo);
+			extest_serialize_propset_double("zdouble", 23.23, zo);
+			break;
+
+		case 5:
+			extest_serialize_propset_string("zstring", "test", zo);
+			break;
 	}
 
 }
@@ -213,12 +224,14 @@ static int extest_serialize_custom_callback(zval *object, unsigned char **buffer
 
 	switch (intern->exam) {
 		case 0:
+			/* single string property */
 			php_var_serialize_object_start(&buf, object, 1 TSRMLS_CC);
 			php_var_serialize_property_string(&buf, "key", "value");
 			php_var_serialize_object_end(&buf);
 			break;
 
 		case 1:
+			/* string properties */
 			php_var_serialize_object_start(&buf, object, 5 TSRMLS_CC);
 			php_var_serialize_property_string(&buf, "key1", "value1");
 			php_var_serialize_property_string(&buf, "key2", "value2");
@@ -229,6 +242,7 @@ static int extest_serialize_custom_callback(zval *object, unsigned char **buffer
 			break;
 
 		case 2:
+			/* int and bool properties */
 			php_var_serialize_object_start(&buf, object, 5 TSRMLS_CC);
 			php_var_serialize_property_bool(&buf, "key1", 1);
 			php_var_serialize_property_long(&buf, "key2", 2);
@@ -239,11 +253,50 @@ static int extest_serialize_custom_callback(zval *object, unsigned char **buffer
 			break;
 
 		case 3:
+			/* double properties */
 			php_var_serialize_object_start(&buf, object, 3 TSRMLS_CC);
 			php_var_serialize_property_double(&buf, "key1", 1.1 TSRMLS_CC);
 			php_var_serialize_property_double(&buf, "key2", 1.2 TSRMLS_CC);
 			php_var_serialize_property_double(&buf, "key3", -1.3 TSRMLS_CC);
 			php_var_serialize_object_end(&buf);
+			break;
+
+		case 4:
+			{
+				zval value;
+				php_var_serialize_object_start(&buf, object, 1 TSRMLS_CC);
+				ZVAL_STRING(&value, "test", 0);
+				php_var_serialize_property_zval(&buf, "zstring", &value, data TSRMLS_CC);
+				ZVAL_BOOL(&value, 1);
+				php_var_serialize_property_zval(&buf, "zbool", &value, data TSRMLS_CC);
+				ZVAL_LONG(&value, 23);
+				php_var_serialize_property_zval(&buf, "zlong", &value, data TSRMLS_CC);
+				ZVAL_DOUBLE(&value, 23.23);
+				php_var_serialize_property_zval(&buf, "zdouble", &value, data TSRMLS_CC);
+				php_var_serialize_object_end(&buf);
+			}
+			break;
+
+		case 5:
+			{
+				zval array;
+				/* init array */
+				ALLOC_HASHTABLE(Z_ARRVAL(array));
+				zend_hash_init(Z_ARRVAL(array), 0, NULL, ZVAL_PTR_DTOR, 0);
+				Z_TYPE(array) = IS_ARRAY;
+				/* set values */
+				add_next_index_bool(&array, 1);
+				add_next_index_long(&array, 23);
+				add_next_index_double(&array, 23.23);
+				add_next_index_string(&array, "test", 1);
+				/* serialize */
+				php_var_serialize_object_start(&buf, object, 1 TSRMLS_CC);
+				php_var_serialize_property_zval(&buf, "zarray", &array, data TSRMLS_CC);
+				php_var_serialize_object_end(&buf);
+				/* clean up */
+				zend_hash_destroy(Z_ARRVAL(array));
+				FREE_HASHTABLE(Z_ARRVAL(array));
+			}
 			break;
 	}
 
@@ -268,57 +321,34 @@ static void extest_unserialize_dump_property(zval *key, zval *value) {
 /* {{{ extest_unserialize_custom_callback */
 static int extest_unserialize_custom_callback(zval **object, zend_class_entry *ce, const unsigned char *buf, zend_uint buf_len, zend_unserialize_data *data TSRMLS_DC)
 {
-	int i;
+	int i, n = 0;
 	zval key, value;
 
 	switch (EXTEST_G(exam)) {
 		case 0:
-			if (php_var_unserialize_property(&key, &value, &buf, &buf_len, data TSRMLS_CC)) {
-				extest_unserialize_dump_property(&key, &value);
-			} else {
-				return -1;
-			}
-
+		case 5:
+			n = 1;
 			break;
-
 		case 1:
-			for (i = 0; i < 5; i++) {
-				if (php_var_unserialize_property(&key, &value, &buf, &buf_len, data TSRMLS_CC)) {
-					extest_unserialize_dump_property(&key, &value);
-				} else {
-					return -1;
-				}
-			}
-			/*
-			php_var_serialize_object_start(&buf, object, 5 TSRMLS_CC);
-			php_var_serialize_property_string(&buf, "key1", "value1");
-			php_var_serialize_property_string(&buf, "key2", "value2");
-			php_var_serialize_property_string(&buf, "key3", "value3x");
-			php_var_serialize_property_string(&buf, "key4", "value4");
-			php_var_serialize_property_string(&buf, "key5", "value5");
-			php_var_serialize_object_end(&buf);
-			*/
-			break;
-
 		case 2:
-			for (i = 0; i < 5; i++) {
-				if (php_var_unserialize_property(&key, &value, &buf, &buf_len, data TSRMLS_CC)) {
-					extest_unserialize_dump_property(&key, &value);
-				} else {
-					return -1;
-				}
-			}
+			n = 5;
 			break;
-
 		case 3:
-			for (i = 0; i < 3; i++) {
-				if (php_var_unserialize_property(&key, &value, &buf, &buf_len, data TSRMLS_CC)) {
-					extest_unserialize_dump_property(&key, &value);
-				} else {
-					return -1;
-				}
-			}
+			n = 3;
 			break;
+		case 4:
+			n = 4;
+			break;
+		default:
+			return -1;
+	}
+
+	for (i = 0; i < n; i++) {
+		if (php_var_unserialize_property(&key, &value, &buf, &buf_len, data TSRMLS_CC)) {
+			extest_unserialize_dump_property(&key, &value);
+		} else {
+			return -1;
+		}
 	}
 
 	return (int) buf_len;
