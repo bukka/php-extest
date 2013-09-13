@@ -22,7 +22,7 @@
 #include "ext/standard/php_smart_str.h"
 #include "ext/standard/php_var.h"
 
-#define EXTEST_NUM_EXAMS 5
+#define EXTEST_NUM_EXAMS 7
 
 typedef struct {
 	zend_object zo;
@@ -118,40 +118,47 @@ static zend_object_value extest_serialize_object_clone(zval *this_ptr TSRMLS_DC)
 /* }}} */
 
 /* {{{ extest_serialize_propset_long */
-static inline void extest_serialize_propset_bool(const char *key, int value, zend_object *zo) {
+static inline void extest_serialize_propset_bool_ex(const char *key, int value, HashTable *ht) {
 	zval *tmp;
 	MAKE_STD_ZVAL(tmp);
 	ZVAL_BOOL(tmp, value);
-	zend_hash_update(zo->properties, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
+	zend_hash_update(ht, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
 }
 /* }}} */
 
 /* {{{ extest_serialize_propset_long */
-static inline void extest_serialize_propset_long(const char *key, long value, zend_object *zo) {
+static inline void extest_serialize_propset_long_ex(const char *key, long value, HashTable *ht) {
 	zval *tmp;
 	MAKE_STD_ZVAL(tmp);
 	ZVAL_LONG(tmp, value);
-	zend_hash_update(zo->properties, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
+	zend_hash_update(ht, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
 }
 /* }}} */
 
 /* {{{ extest_serialize_propset_double */
-static inline void extest_serialize_propset_double(const char *key, double value, zend_object *zo) {
+static inline void extest_serialize_propset_double_ex(const char *key, double value, HashTable *ht) {
 	zval *tmp;
 	MAKE_STD_ZVAL(tmp);
 	ZVAL_DOUBLE(tmp, value);
-	zend_hash_update(zo->properties, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
+	zend_hash_update(ht, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
 }
 /* }}} */
 
 /* {{{ extest_serialize_propset_string */
-static inline void extest_serialize_propset_string(const char *key, char *value, zend_object *zo) {
+static inline void extest_serialize_propset_string_ex(const char *key, char *value, HashTable *ht) {
 	zval *tmp;
 	MAKE_STD_ZVAL(tmp);
 	ZVAL_STRING(tmp, value, 1);
-	zend_hash_update(zo->properties, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
+	zend_hash_update(ht, key, strlen(key) + 1, (void *) &tmp, sizeof(zval *), NULL);
 }
 /* }}} */
+
+/* macros allowing passing of zend_object */
+#define extest_serialize_propset_bool(key, value, zo) extest_serialize_propset_bool_ex(key, value, zo->properties)
+#define extest_serialize_propset_long(key, value, zo) extest_serialize_propset_long_ex(key, value, zo->properties)
+#define extest_serialize_propset_double(key, value, zo) extest_serialize_propset_double_ex(key, value, zo->properties)
+#define extest_serialize_propset_string(key, value, zo) extest_serialize_propset_string_ex(key, value, zo->properties)
+
 
 /* {{{ extest_serialize_set_properties */
 static void extest_serialize_set_properties(zend_object *zo, int exam, int destroy)
@@ -193,6 +200,7 @@ static void extest_serialize_set_properties(zend_object *zo, int exam, int destr
 			break;
 
 		case 4:
+		case 6:
 			extest_serialize_propset_string("zstring", "test", zo);
 			extest_serialize_propset_bool("zbool", 1, zo);
 			extest_serialize_propset_long("zlong", 23, zo);
@@ -200,7 +208,21 @@ static void extest_serialize_set_properties(zend_object *zo, int exam, int destr
 			break;
 
 		case 5:
-			extest_serialize_propset_string("zstring", "test", zo);
+			{
+				zval *parray;
+				MAKE_STD_ZVAL(parray);
+				/* init array */
+				ALLOC_HASHTABLE(Z_ARRVAL_P(parray));
+				zend_hash_init(Z_ARRVAL_P(parray), 0, NULL, ZVAL_PTR_DTOR, 0);
+				Z_TYPE_P(parray) = IS_ARRAY;
+				/* set values */
+				add_next_index_bool(parray, 1);
+				add_next_index_long(parray, 23);
+				add_next_index_double(parray, 23.23);
+				add_next_index_string(parray, "test", 1);
+				/* save to props */
+				zend_hash_update(zo->properties, "zarray", sizeof("zarray"), (void *) &parray, sizeof(zval *), NULL);
+			}
 			break;
 	}
 
@@ -298,6 +320,27 @@ static int extest_serialize_custom_callback(zval *object, unsigned char **buffer
 				FREE_HASHTABLE(Z_ARRVAL(array));
 			}
 			break;
+
+		case 6:
+			{
+				HashTable *ht;
+				/* init array */
+				ALLOC_HASHTABLE(ht);
+				zend_hash_init(ht, 0, NULL, ZVAL_PTR_DTOR, 0);
+				/* set values */
+				extest_serialize_propset_string_ex("zstring", "test", ht);
+				extest_serialize_propset_bool_ex("zbool", 1, ht);
+				extest_serialize_propset_long_ex("zlong", 23, ht);
+				extest_serialize_propset_double_ex("zdouble", 23.23, ht);
+				/* serialize */
+				php_var_serialize_object_start(&buf, object, 1 TSRMLS_CC);
+				php_var_serialize_properties(&buf, ht, data TSRMLS_CC);
+				php_var_serialize_object_end(&buf);
+				/* clean up */
+				zend_hash_destroy(ht);
+				FREE_HASHTABLE(ht);
+			}
+			break;
 	}
 
 	smart_str_0(&buf);
@@ -337,6 +380,7 @@ static int extest_unserialize_custom_callback(zval **object, zend_class_entry *c
 			n = 3;
 			break;
 		case 4:
+		case 6:
 			n = 4;
 			break;
 		default:
