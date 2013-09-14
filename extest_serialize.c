@@ -174,7 +174,6 @@ static void extest_serialize_set_properties(zend_object *zo, int exam, int destr
 
 	switch (exam) {
 		case 0:
-			extest_serialize_propset_string("key", "value", zo);
 			break;
 
 		case 1:
@@ -246,9 +245,8 @@ static int extest_serialize_custom_callback(zval *object, unsigned char **buffer
 
 	switch (intern->exam) {
 		case 0:
-			/* single string property */
-			php_var_serialize_object_start(&buf, object, 1 TSRMLS_CC);
-			php_var_serialize_property_string(&buf, "key", "value");
+			/* empty */
+			php_var_serialize_object_start(&buf, object, 0 TSRMLS_CC);
 			php_var_serialize_object_end(&buf);
 			break;
 
@@ -352,9 +350,9 @@ static int extest_serialize_custom_callback(zval *object, unsigned char **buffer
 /* }}} */
 
 /* {{{ extest_unserialize_dump_property */
-static void extest_unserialize_dump_property(zval *key, zval *value) {
+static void extest_unserialize_dump_property(zval *key, zval *value TSRMLS_DC) {
 	php_printf("Key: %s; Value: ", Z_STRVAL_P(key));
-	zend_print_zval(value, 0);
+	zend_print_zval_r(value, 0 TSRMLS_CC);
 	php_printf("\n");
 	zval_dtor(key);
 	zval_dtor(value);
@@ -369,8 +367,7 @@ static int extest_unserialize_custom_callback(zval **object, zend_class_entry *c
 
 	switch (EXTEST_G(exam)) {
 		case 0:
-		case 5:
-			n = 1;
+			n = 0;
 			break;
 		case 1:
 		case 2:
@@ -383,13 +380,16 @@ static int extest_unserialize_custom_callback(zval **object, zend_class_entry *c
 		case 6:
 			n = 4;
 			break;
+		case 5:
+			n = 1;
+			break;
 		default:
 			return -1;
 	}
 
 	for (i = 0; i < n; i++) {
 		if (php_var_unserialize_property(&key, &value, &buf, &buf_len, data TSRMLS_CC)) {
-			extest_unserialize_dump_property(&key, &value);
+			extest_unserialize_dump_property(&key, &value TSRMLS_CC);
 		} else {
 			return -1;
 		}
