@@ -377,12 +377,34 @@ static int extest_unserialize_custom_callback(zval **object, zend_class_entry *c
 			n = 3;
 			break;
 		case 4:
-		case 6:
 			n = 4;
 			break;
 		case 5:
 			n = 1;
 			break;
+		case 6:
+			n = 4;
+			/* this case is different in terms that values are serialized to HashTable */
+			{
+				/* use array for easy printing */
+				zval array;
+				int rc;
+				/* init array */
+				ALLOC_HASHTABLE(Z_ARRVAL(array));
+				zend_hash_init(Z_ARRVAL(array), n, NULL, ZVAL_PTR_DTOR, 0);
+				Z_TYPE(array) = IS_ARRAY;
+				/* unserialize HashTable */
+				if (php_var_unserialize_properties(Z_ARRVAL(array), &buf, &buf_len, n, data TSRMLS_CC)) {
+					zend_print_zval_r(&array, 0 TSRMLS_CC);
+					rc = (int) buf_len;
+				} else {
+					rc = -1;
+				}
+				zend_hash_destroy(Z_ARRVAL(array));
+				FREE_HASHTABLE(Z_ARRVAL(array));
+				return rc;
+			}
+
 		default:
 			return -1;
 	}
