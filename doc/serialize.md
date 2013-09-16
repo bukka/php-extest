@@ -254,7 +254,7 @@ The unserialization depends on the specific use use cases. The following code ex
 ```
 static int extest_unserialize_custom_callback(zval **object, zend_class_entry *ce, const unsigned char *buf, zend_uint buf_len, zend_unserialize_data *data TSRMLS_DC)
 {
-	n = extest_get_number_of_properties(object);
+	int n = extest_get_number_of_properties(object);
 
 	for (i = 0; i < n; i++) {
 		if (php_var_unserialize_property(&key, &value, &buf, &buf_len, data TSRMLS_CC)) {
@@ -275,7 +275,7 @@ static int extest_unserialize_custom_callback(zval **object, zend_class_entry *c
 ```
 static int extest_unserialize_custom_callback(zval **object, zend_class_entry *ce, const unsigned char *buf, zend_uint buf_len, zend_unserialize_data *data TSRMLS_DC)
 {
-	n = extest_get_number_of_properties(object);
+	int n = extest_get_number_of_properties(object);
 
 	/* use array for easy printing */
 	zval array;
