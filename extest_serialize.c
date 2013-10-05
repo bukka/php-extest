@@ -362,54 +362,30 @@ static void extest_unserialize_dump_property(zval *key, zval *value TSRMLS_DC) {
 /* {{{ extest_unserialize_custom_callback */
 static int extest_unserialize_custom_callback(zval **object, zend_class_entry *ce, const unsigned char *buf, zend_uint buf_len, zend_unserialize_data *data TSRMLS_DC)
 {
-	int i, n = 0;
 	zval key, value;
 
-	switch (EXTEST_G(exam)) {
-		case 0:
-			n = 0;
-			break;
-		case 1:
-		case 2:
-			n = 5;
-			break;
-		case 3:
-			n = 3;
-			break;
-		case 4:
-			n = 4;
-			break;
-		case 5:
-			n = 1;
-			break;
-		case 6:
-			n = 4;
-			/* this case is different in terms that values are serialized to HashTable */
-			{
-				/* use array for easy printing */
-				zval array;
-				int rc;
-				/* init array */
-				ALLOC_HASHTABLE(Z_ARRVAL(array));
-				zend_hash_init(Z_ARRVAL(array), n, NULL, ZVAL_PTR_DTOR, 0);
-				Z_TYPE(array) = IS_ARRAY;
-				/* unserialize HashTable */
-				if (php_var_unserialize_properties(Z_ARRVAL(array), &buf, &buf_len, n, data TSRMLS_CC)) {
-					zend_print_zval_r(&array, 0 TSRMLS_CC);
-					rc = (int) buf_len;
-				} else {
-					rc = -1;
-				}
-				zend_hash_destroy(Z_ARRVAL(array));
-				FREE_HASHTABLE(Z_ARRVAL(array));
-				return rc;
-			}
-
-		default:
-			return -1;
+	if (EXTEST_G(exam) == 6) {
+		/* use array for easy printing */
+		zval array;
+		int rc;
+		/* init array */
+		ALLOC_HASHTABLE(Z_ARRVAL(array));
+		zend_hash_init(Z_ARRVAL(array), 4, NULL, ZVAL_PTR_DTOR, 0);
+		Z_TYPE(array) = IS_ARRAY;
+		/* unserialize HashTable */
+		if (php_var_unserialize_properties(Z_ARRVAL(array), &buf, &buf_len, data TSRMLS_CC)) {
+			zend_print_zval_r(&array, 0 TSRMLS_CC);
+			rc = (int) buf_len;
+		} else {
+			rc = -1;
+		}
+		zend_hash_destroy(Z_ARRVAL(array));
+		FREE_HASHTABLE(Z_ARRVAL(array));
+		return rc;
 	}
 
-	for (i = 0; i < n; i++) {
+	while (php_var_unserialize_has_properties(buf, buf_len))
+	{
 		if (php_var_unserialize_property(&key, &value, &buf, &buf_len, data TSRMLS_CC)) {
 			extest_unserialize_dump_property(&key, &value TSRMLS_CC);
 		} else {
