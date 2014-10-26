@@ -16,18 +16,17 @@
    +----------------------------------------------------------------------+
 */
 
-#ifndef PHP_EXTEST_SERIALIZE_H
-#define PHP_EXTEST_SERIALIZE_H
+#ifndef PHP_EXTEST_COMPAT_H
+#define PHP_EXTEST_COMPAT_H
 
-PHP_MINIT_FUNCTION(extest_serialize);
+PHP_MINIT_FUNCTION(extest_compat);
 
-PHP_METHOD(ExtestSerialize, __construct);
-PHP_METHOD(ExtestSerialize, setExam);
-PHP_METHOD(ExtestSerialize, getExam);
-PHP_METHOD(ExtestSerialize, setGlobalExam);
-PHP_METHOD(ExtestSerialize, getGlobalExam);
+PHP_FUNCTION(extest_compat_long);
+PHP_FUNCTION(extest_compat_str);
 
-#endif	/* PHP_EXTEST_SERIALIZE_H */
+extern const zend_function_entry extest_compat_functions[];
+
+#endif	/* PHP_EXTEST_H */
 
 
 /*

@@ -4,6 +4,6 @@
 ARG_ENABLE("extest", "enable extest support", "no");
 
 if (PHP_EXTEST != "no") {
-	EXTENSION("extest", "extest.c");
+	EXTENSION("extest", "extest.c extest_compat.c extest_serialize.c");
 }
 

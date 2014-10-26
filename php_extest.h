@@ -36,6 +36,9 @@ extern zend_module_entry extest_module_entry;
 #include "TSRM.h"
 #endif
 
+#define PHP_EXTEST_SERIALIZE 0
+#define PHP_EXTEST_COMPAT    1
+
 ZEND_BEGIN_MODULE_GLOBALS(extest)
 	long exam;
 ZEND_END_MODULE_GLOBALS(extest)

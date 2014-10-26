@@ -24,7 +24,10 @@
 
 #include "php.h"
 #include "php_extest.h"
+#include "php_extest_compat.h"
+#if PHP_EXTEST_SERIALIZE
 #include "php_extest_serialize.h"
+#endif
 #include "ext/standard/info.h"
 
 ZEND_DECLARE_MODULE_GLOBALS(extest)
@@ -33,9 +36,10 @@ ZEND_DECLARE_MODULE_GLOBALS(extest)
  */
 PHP_MINIT_FUNCTION(extest)
 {
-	ZEND_INIT_MODULE_GLOBALS(extest, NULL, NULL);
-
+	PHP_MINIT(extest_compat)(INIT_FUNC_ARGS_PASSTHRU);
+#if PHP_EXTEST_SERIALIZE
 	PHP_MINIT(extest_serialize)(INIT_FUNC_ARGS_PASSTHRU);
+#endif
 
 	return SUCCESS;
 }
@@ -59,19 +63,12 @@ PHP_MINFO_FUNCTION(extest)
 }
 /* }}} */
 
-/* {{{ extest_functions[]
- */
-const zend_function_entry extest_functions[] = {
-	PHP_FE_END
-};
-/* }}} */
-
 /* {{{ extest_module_entry
  */
 zend_module_entry extest_module_entry = {
 	STANDARD_MODULE_HEADER,
 	"extest",
-	extest_functions,
+	extest_compat_functions,
 	PHP_MINIT(extest),
 	PHP_MSHUTDOWN(extest),
 	NULL,

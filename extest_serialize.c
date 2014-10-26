@@ -18,9 +18,14 @@
 
 #include "php.h"
 #include "php_extest.h"
+
+#if PHP_EXTEST_SERIALIZE
+
 #include "php_extest_serialize.h"
 #include "ext/standard/php_smart_str.h"
 #include "ext/standard/php_var.h"
+
+
 
 #define EXTEST_NUM_EXAMS 7
 
@@ -515,6 +520,8 @@ PHP_METHOD(ExtestSerialize, getGlobalExam)
 	RETURN_LONG(EXTEST_G(exam));
 }
 /* }}} */
+
+#endif
 
 /*
  * Local variables:
