@@ -1,0 +1,3 @@
+[submodule "phpc"]
+	path = phpc
+	url = git@github.com:bukka/phpc.git
