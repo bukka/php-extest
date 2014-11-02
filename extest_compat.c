@@ -27,13 +27,14 @@ ZEND_ARG_INFO(0, value)
 ZEND_ARG_INFO(0, fail)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO(arginfo_extest_compat_str, 0)
+ZEND_BEGIN_ARG_INFO(arginfo_extest_compat_value, 0)
 ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
 const zend_function_entry extest_compat_functions[] = {
 	PHP_FE(extest_compat_long,   arginfo_extest_compat_long)
-	PHP_FE(extest_compat_str,    arginfo_extest_compat_str)
+	PHP_FE(extest_compat_str,    arginfo_extest_compat_value)
+	PHP_FE(extest_compat_array,  arginfo_extest_compat_value)
 	PHPC_FE_END
 };
 
@@ -47,7 +48,7 @@ PHP_MINIT_FUNCTION(extest_compat)
 /* }}} */
 
 /* {{{ proto extest_compat_long(int value)
-   Scalar functions test */
+   Scalar function test */
 PHP_FUNCTION(extest_compat_long)
 {
 	phpc_long_t value;
@@ -81,7 +82,7 @@ static void php_extest_print_half_str(PHPC_STR_ARG(value)) { /* {{{ */
 /* }}} */
 
 /* {{{ proto extest_compat_str(string value)
-   Scalar functions test */
+   String function test */
 PHP_FUNCTION(extest_compat_str)
 {
 	char *cstr;
@@ -97,6 +98,30 @@ PHP_FUNCTION(extest_compat_str)
 	php_extest_print_half_str(PHPC_STR_PASS(value));
 
 	PHPC_STR_RETURN(value);
+}
+/* }}} */
+
+/* {{{ proto extest_compat_array(string value)
+   Array function test */
+PHP_FUNCTION(extest_compat_array)
+{
+	zval *arr;
+	phpc_val *val;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &arr) == FAILURE) {
+		return;
+	}
+
+	 PHPC_HASH_FOREACH_VAL(Z_ARRVAL_P(arr), val) {
+		switch (PHPC_TYPE_P(val)) {
+			case IS_STRING:
+				php_printf("STRING\n");
+				break;
+			default:
+				php_printf("NO STRING\n");
+				break;
+		}
+	} PHPC_HASH_FOREACH_END();
 }
 /* }}} */
 
