@@ -19,6 +19,7 @@
 #include "php.h"
 #include "php_extest.h"
 #include "php_extest_compat.h"
+#include "ext/standard/php_var.h"
 
 #include "phpc/phpc.h"
 
@@ -112,15 +113,12 @@ PHP_FUNCTION(extest_compat_array)
 		return;
 	}
 
-	 PHPC_HASH_FOREACH_VAL(Z_ARRVAL_P(arr), val) {
-		switch (PHPC_TYPE_P(val)) {
-			case IS_STRING:
-				php_printf("STRING\n");
-				break;
-			default:
-				php_printf("NO STRING\n");
-				break;
-		}
+	PHPC_HASH_FOREACH_VAL(Z_ARRVAL_P(arr), val) {
+		/*
+		 * it can be used only with phpc_val as it's ptr ptr in 5 and ptr in 7
+		 * - the same is true for php_debug_zval_dump
+		 */
+		php_var_dump(val, 1 TSRMLS_CC);
 	} PHPC_HASH_FOREACH_END();
 }
 /* }}} */
