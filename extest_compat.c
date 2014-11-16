@@ -108,6 +108,8 @@ PHP_FUNCTION(extest_compat_array)
 {
 	zval *arr;
 	phpc_val *val;
+	PHPC_STR_DECLARE(key);
+	PHPC_STR_LEN_UNUSED(key);
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &arr) == FAILURE) {
 		return;
@@ -118,6 +120,11 @@ PHP_FUNCTION(extest_compat_array)
 		 * it can be used only with phpc_val as it's ptr ptr in 5 and ptr in 7
 		 * - the same is true for php_debug_zval_dump
 		 */
+		php_var_dump(val, 1 TSRMLS_CC);
+	} PHPC_HASH_FOREACH_END();
+
+	PHPC_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(arr), key, val) {
+		printf("key: \"%s\"\n", PHPC_STR_VAL(key));
 		php_var_dump(val, 1 TSRMLS_CC);
 	} PHPC_HASH_FOREACH_END();
 }
