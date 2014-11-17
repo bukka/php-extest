@@ -107,6 +107,7 @@ PHP_FUNCTION(extest_compat_str)
 PHP_FUNCTION(extest_compat_array)
 {
 	zval *arr;
+	phpc_ulong_t idx;
 	phpc_val *val;
 	PHPC_STR_DECLARE(key);
 	PHPC_STR_LEN_UNUSED(key);
@@ -124,7 +125,16 @@ PHP_FUNCTION(extest_compat_array)
 	} PHPC_HASH_FOREACH_END();
 
 	PHPC_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(arr), key, val) {
-		printf("key: \"%s\"\n", PHPC_STR_VAL(key));
+		printf("key: \"%s\"\n", PHPC_STR_VAL(key) ? PHPC_STR_VAL(key) : "");
+		php_var_dump(val, 1 TSRMLS_CC);
+	} PHPC_HASH_FOREACH_END();
+
+	PHPC_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(arr), idx, key, val) {
+		if (PHPC_STR_VAL(key)) {
+			printf("key: \"%s\"\n", PHPC_STR_VAL(key));
+		} else {
+			printf("index: %lu\n", idx);
+		}
 		php_var_dump(val, 1 TSRMLS_CC);
 	} PHPC_HASH_FOREACH_END();
 }
