@@ -23,6 +23,18 @@
 
 #include "phpc/phpc.h"
 
+typedef struct _php_extest_compat_obj {
+	PHPC_OBJECT_MEMBER_FIRST
+	char *name;
+	int type;
+	PHPC_OBJECT_MEMBER_LAST
+} php_extest_compat_obj;
+
+const zend_function_entry php_extest_compat_obj_funs[] = {
+	PHP_ME(ExtestCompat, test, NULL, ZEND_ACC_PUBLIC)
+	PHPC_FE_END
+};
+
 ZEND_BEGIN_ARG_INFO(arginfo_extest_compat_long, 0)
 ZEND_ARG_INFO(0, value)
 ZEND_ARG_INFO(0, fail)
@@ -43,8 +55,19 @@ const zend_function_entry extest_compat_functions[] = {
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(extest_compat)
 {
-	
+	zend_class_entry ce_compat;
+
+	/* init classes */
+	INIT_CLASS_ENTRY(ce_compat, "ExtestCompat", php_extest_compat_obj_funs);
+
 	return SUCCESS;
+}
+/* }}} */
+
+/* {{{ proto ExtestCompat::test() */
+PHP_METHOD(ExtestCompat, test)
+{
+	
 }
 /* }}} */
 

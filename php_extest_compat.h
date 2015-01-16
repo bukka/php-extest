@@ -25,6 +25,8 @@ PHP_FUNCTION(extest_compat_long);
 PHP_FUNCTION(extest_compat_str);
 PHP_FUNCTION(extest_compat_array);
 
+PHP_METHOD(ExtestCompat, test);
+
 extern const zend_function_entry extest_compat_functions[];
 
 #endif	/* PHP_EXTEST_H */
