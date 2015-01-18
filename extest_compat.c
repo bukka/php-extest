@@ -24,10 +24,10 @@
 #include "phpc/phpc.h"
 
 typedef struct _php_extest_compat_obj {
-	PHPC_OBJECT_MEMBER_FIRST
+	PHPC_OBJ_MEMBER_FIRST
 	char *name;
 	int type;
-	PHPC_OBJECT_MEMBER_LAST
+	PHPC_OBJ_MEMBER_LAST
 } php_extest_compat_obj;
 
 const zend_function_entry php_extest_compat_obj_funs[] = {
@@ -51,6 +51,30 @@ const zend_function_entry extest_compat_functions[] = {
 	PHPC_FE_END
 };
 
+zend_class_entry *extest_compat_ce;
+
+static zend_object_handlers extest_compat_handlers;
+
+PHPC_OBJ_HANDLER_FREE_OBJ_DEFINE(extest_compat_obj_free)
+{
+
+}
+
+PHPC_OBJ_HANDLER_CREATE_EX_DEFINE(extest_compat_obj_create)
+{
+	PHPC_OBJ_HANDLER_CREATE_EX_INIT();
+	php_extest_compat_obj *intern;
+
+	intern = PHPC_OBJ_HANDLER_CREATE_EX_ALLOC(php_extest_compat_obj);
+	PHPC_OBJ_HANDLER_CREATE_INIT_EX_PROPS(intern);
+
+	PHPC_OBJ_HANDLER_CREATE_EX_RETURN(intern, extest_compat_obj_free);
+}
+
+PHPC_OBJ_HANDLER_CREATE_DEFINE(extest_compat_obj_create)
+{
+	return PHPC_OBJ_HANDLER_CREATE_EX_CALL();
+}
 
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(extest_compat)
@@ -59,6 +83,11 @@ PHP_MINIT_FUNCTION(extest_compat)
 
 	/* init classes */
 	INIT_CLASS_ENTRY(ce_compat, "ExtestCompat", php_extest_compat_obj_funs);
+	ce_compat.create_object = extest_compat_obj_create;
+	extest_compat_ce = PHPC_REGISTER_INTERNAL_CLASS(&ce_compat);
+	memcpy(&extest_compat_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
+	PHPC_OBJ_SET_HANDLER_OFFSET(extest_compat_handlers, php_extest_compat_obj);
+	PHPC_OBJ_SET_HANDLER_FREE_OBJ(extest_compat_handlers, extest_compat_obj_free);
 
 	return SUCCESS;
 }
