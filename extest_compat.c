@@ -55,19 +55,19 @@ zend_class_entry *extest_compat_ce;
 
 static zend_object_handlers extest_compat_handlers;
 
-PHPC_OBJ_HANDLER_FREE_OBJ_FCE(extest_compat_obj_free)
+PHPC_OBJ_HANDLER_FREE_OBJ(extest_compat)
 {
 	/* PHP_OBJ_FROM_ZOBJ(object, php_extest_compat_obj) */
-	php_extest_compat_obj *intern =  PHP_OBJ_HANDLER_GET_OBJ_FROM_ZOBJ(php_extest_compat_obj);
+	php_extest_compat_obj *intern =  PHP_OBJ_GET_HANDLER_OBJ_FROM_ZOBJ(php_extest_compat_obj);
 
 	if (intern->name) {
 		efree(intern->name);
 	}
 
-	PHPC_OBJ_HANDLER_FREE_FREE_OBJ(intern);
+	PHPC_OBJ_HANDLER_FREE_OBJ_FREE(intern);
 }
 
-PHPC_OBJ_HANDLER_CREATE_EX_FCE(extest_compat_obj_create)
+PHPC_OBJ_HANDLER_CREATE_EX(extest_compat)
 {
 	PHPC_OBJ_HANDLER_CREATE_EX_DEFINE();
 	php_extest_compat_obj *intern;
@@ -75,12 +75,12 @@ PHPC_OBJ_HANDLER_CREATE_EX_FCE(extest_compat_obj_create)
 	intern = PHPC_OBJ_HANDLER_CREATE_EX_ALLOC(php_extest_compat_obj);
 	PHPC_OBJ_HANDLER_INIT_CREATE_EX_PROPS(intern);
 
-	PHPC_OBJ_HANDLER_CREATE_EX_RETURN(intern, extest_compat_obj_free);
+	PHPC_OBJ_HANDLER_CREATE_EX_RETURN(extest_compat, intern);
 }
 
-PHPC_OBJ_HANDLER_CREATE_FCE(extest_compat_obj_create)
+PHPC_OBJ_HANDLER_CREATE(extest_compat)
 {
-	return PHPC_OBJ_HANDLER_CREATE_EX_CALL(extest_compat_obj_create);
+	return PHPC_OBJ_HANDLER_CREATE_EX_CALL(extest_compat);
 }
 
 /* {{{ PHP_MINIT_FUNCTION */
