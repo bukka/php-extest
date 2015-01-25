@@ -69,7 +69,7 @@ PHPC_OBJ_HANDLER_FREE_OBJ(extest_compat)
 
 PHPC_OBJ_HANDLER_CREATE_EX(extest_compat)
 {
-	PHPC_OBJ_HANDLER_CREATE_EX_DEFINE();
+	PHPC_OBJ_HANDLER_CREATE_EX_INIT();
 	php_extest_compat_obj *intern;
 
 	intern = PHPC_OBJ_HANDLER_CREATE_EX_ALLOC(php_extest_compat_obj);
@@ -80,7 +80,18 @@ PHPC_OBJ_HANDLER_CREATE_EX(extest_compat)
 
 PHPC_OBJ_HANDLER_CREATE(extest_compat)
 {
-	return PHPC_OBJ_HANDLER_CREATE_EX_CALL(extest_compat);
+	PHPC_OBJ_HANDLER_CREATE_RETURN(extest_compat);
+}
+
+PHPC_OBJ_HANDLER_CLONE(extest_compat)
+{
+	PHPC_OBJ_HANDLER_CLONE_INIT();
+	php_extest_compat_obj *old_obj, *new_obj;
+
+	old_obj = PHPC_OBJ_FROM_THIS(php_extest_compat_obj);
+	PHPC_OBJ_HANDLER_CLONE_MEMBERS(new_obj, old_obj)
+
+	return PHPC_OBJ_HANDLER_CLONE_RETURN();
 }
 
 /* {{{ PHP_MINIT_FUNCTION */
