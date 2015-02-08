@@ -23,12 +23,10 @@
 
 #include "phpc/phpc.h"
 
-typedef struct _php_extest_compat_obj {
-	PHPC_OBJ_MEMBER_FIRST
+PHPC_OBJ_STRUCT_BEGIN(extest_compat)
 	char *name;
 	int type;
-	PHPC_OBJ_MEMBER_LAST
-} php_extest_compat_obj;
+PHPC_OBJ_STRUCT_END()
 
 const zend_function_entry php_extest_compat_obj_funs[] = {
 	PHP_ME(ExtestCompat, test, NULL, ZEND_ACC_PUBLIC)
@@ -57,8 +55,7 @@ PHPC_OBJ_GET_HANDLER_VAR_DEF(extest_compat);
 
 PHPC_OBJ_HANDLER_FREE_OBJ(extest_compat)
 {
-	/* PHP_OBJ_FROM_ZOBJ(object, php_extest_compat_obj) */
-	php_extest_compat_obj *intern =  PHP_OBJ_GET_HANDLER_OBJ_FROM_ZOBJ(php_extest_compat_obj);
+	PHPC_OBJ_STRUCT_PTR(extest_compat, intern) = PHP_OBJ_GET_HANDLER_OBJ_FROM_ZOBJ(extest_compat);
 
 	if (intern->name) {
 		efree(intern->name);
@@ -67,18 +64,22 @@ PHPC_OBJ_HANDLER_FREE_OBJ(extest_compat)
 	PHPC_OBJ_HANDLER_FREE_OBJ_FREE(intern);
 }
 
-PHPC_OBJ_HANDLER_CREATE_EX(extest_compat, php_extest_compat_obj)
+PHPC_OBJ_HANDLER_CREATE_EX(extest_compat)
 {
 	PHPC_OBJ_HANDLER_CREATE_EX_INIT();
-	php_extest_compat_obj *intern;
+	PHPC_OBJ_STRUCT_PTR(extest_compat, intern);
 
-	intern = PHPC_OBJ_HANDLER_CREATE_EX_ALLOC(php_extest_compat_obj);
+	intern = PHPC_OBJ_HANDLER_CREATE_EX_ALLOC(extest_compat);
 	PHPC_OBJ_HANDLER_INIT_CREATE_EX_PROPS(intern);
+
+	/* custom setup */
+	intern->name = estrdup("hello");
+	intern->type = 1;
 
 	PHPC_OBJ_HANDLER_CREATE_EX_RETURN(extest_compat, intern);
 }
 
-PHPC_OBJ_HANDLER_CREATE(extest_compat, php_extest_compat_obj)
+PHPC_OBJ_HANDLER_CREATE(extest_compat)
 {
 	PHPC_OBJ_HANDLER_CREATE_RETURN(extest_compat);
 }
@@ -86,12 +87,13 @@ PHPC_OBJ_HANDLER_CREATE(extest_compat, php_extest_compat_obj)
 PHPC_OBJ_HANDLER_CLONE(extest_compat)
 {
 	PHPC_OBJ_HANDLER_CLONE_INIT();
-	php_extest_compat_obj *old_obj, *new_obj;
+	PHPC_OBJ_STRUCT_PTR(extest_compat, old_obj);
+	PHPC_OBJ_STRUCT_PTR(extest_compat, new_obj);
 
-	old_obj = PHPC_OBJ_FROM_THIS(php_extest_compat_obj);
-	PHPC_OBJ_HANDLER_CLONE_MEMBERS(new_obj, old_obj)
+	old_obj = PHPC_OBJ_FROM_THIS(extest_compat);
+	PHPC_OBJ_HANDLER_CLONE_MEMBERS(extest_compat, new_obj, old_obj);
 
-	PHPC_OBJ_HANDLER_CLONE_RETURN();
+	PHPC_OBJ_HANDLER_CLONE_RETURN(new_obj);
 }
 
 /* {{{ PHP_MINIT_FUNCTION */
@@ -104,8 +106,8 @@ PHP_MINIT_FUNCTION(extest_compat)
 	PHPC_CLASS_SET_HANDLER_CREATE(ce_compat, extest_compat); /* ce_compat.create_object = extest_compat_obj_create; */
 	extest_compat_ce = PHPC_CLASS_REGISTER(ce_compat);
 	memcpy(&PHPC_OBJ_GET_HANDLER_VAR_NAME(extest_compat), zend_get_std_object_handlers(), sizeof(zend_object_handlers));
-	PHPC_OBJ_SET_HANDLER_OFFSET(PHPC_OBJ_GET_HANDLER_VAR_NAME(extest_compat), php_extest_compat_obj);
-	PHPC_OBJ_SET_HANDLER_FREE_OBJ(PHPC_OBJ_GET_HANDLER_VAR_NAME(extest_compat), extest_compat_obj_free);
+	PHPC_OBJ_SET_HANDLER_OFFSET(extest_compat);
+	PHPC_OBJ_SET_HANDLER_FREE_OBJ(extest_compat);
 
 	return SUCCESS;
 }
@@ -114,7 +116,9 @@ PHP_MINIT_FUNCTION(extest_compat)
 /* {{{ proto ExtestCompat::test() */
 PHP_METHOD(ExtestCompat, test)
 {
-	
+	PHPC_OBJ_STRUCT_PTR(extest_compat, intern) = PHPC_OBJ_FROM_ZVAL(getThis(), extest_compat);
+
+	php_printf("ExtestCompat TEST - name: %s, type: %d\n", intern->name, intern->type);
 }
 /* }}} */
 
