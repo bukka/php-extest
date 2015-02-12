@@ -51,7 +51,7 @@ const zend_function_entry extest_compat_functions[] = {
 
 zend_class_entry *extest_compat_ce;
 
-PHPC_OBJ_GET_HANDLER_VAR_DEF(extest_compat);
+PHPC_OBJ_DEFINE_HANDLER_VAR(extest_compat);
 
 PHPC_OBJ_HANDLER_FREE_OBJ(extest_compat)
 {
