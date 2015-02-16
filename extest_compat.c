@@ -53,7 +53,7 @@ zend_class_entry *extest_compat_ce;
 
 PHPC_OBJ_DEFINE_HANDLER_VAR(extest_compat);
 
-PHPC_OBJ_HANDLER_FREE_OBJ(extest_compat)
+PHPC_OBJ_HANDLER_FREE(extest_compat)
 {
 	PHPC_OBJ_STRUCT_PTR(extest_compat, intern) = PHP_OBJ_GET_HANDLER_OBJ_FROM_ZOBJ(extest_compat);
 
@@ -61,7 +61,7 @@ PHPC_OBJ_HANDLER_FREE_OBJ(extest_compat)
 		efree(intern->name);
 	}
 
-	PHPC_OBJ_HANDLER_FREE_OBJ_FREE(intern);
+	PHPC_OBJ_HANDLER_FREE_DTOR(intern);
 }
 
 PHPC_OBJ_HANDLER_CREATE_EX(extest_compat)
@@ -107,7 +107,7 @@ PHP_MINIT_FUNCTION(extest_compat)
 	extest_compat_ce = PHPC_CLASS_REGISTER(ce_compat);
 	memcpy(&PHPC_OBJ_GET_HANDLER_VAR_NAME(extest_compat), zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 	PHPC_OBJ_SET_HANDLER_OFFSET(extest_compat);
-	PHPC_OBJ_SET_HANDLER_FREE_OBJ(extest_compat);
+	PHPC_OBJ_SET_HANDLER_FREE(extest_compat);
 
 	return SUCCESS;
 }
