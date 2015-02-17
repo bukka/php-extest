@@ -108,6 +108,7 @@ PHP_MINIT_FUNCTION(extest_compat)
 	memcpy(&PHPC_OBJ_GET_HANDLER_VAR_NAME(extest_compat), zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 	PHPC_OBJ_SET_HANDLER_OFFSET(extest_compat);
 	PHPC_OBJ_SET_HANDLER_FREE(extest_compat);
+	PHPC_OBJ_SET_HANDLER_CLONE(extest_compat);
 
 	return SUCCESS;
 }
