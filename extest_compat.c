@@ -152,9 +152,11 @@ PHP_METHOD(ExtestCompat, setName)
 /* {{{ proto ExtestCompat::getName() */
 PHP_METHOD(ExtestCompat, getName)
 {
+	PHPC_STR_DECLARE(name);
 	PHPC_THIS_DECLARE_AND_FETCH(extest_compat);
 
-	RETURN_STRING(PHPC_THIS->name, 1);
+	PHPC_STR_INIT(name, PHPC_THIS->name, strlen(PHPC_THIS->name));
+	PHPC_STR_RETURN(name);
 }
 /* }}} */
 

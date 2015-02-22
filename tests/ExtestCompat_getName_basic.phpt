@@ -1,5 +1,5 @@
 --TEST--
-Test function ExtestCompat::test() by calling it
+Test function ExtestCompat::getName() by calling it
 --FILE--
 <?php
 $ec = new ExtestCompat();
