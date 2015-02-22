@@ -90,7 +90,7 @@ PHPC_OBJ_HANDLER_CLONE(extest_compat)
 	PHPC_OBJ_STRUCT_PTR(extest_compat, old_obj);
 	PHPC_OBJ_STRUCT_PTR(extest_compat, new_obj);
 
-	old_obj = PHPC_OBJ_FROM_THIS(extest_compat);
+	old_obj = PHPC_OBJ_FROM_SELF(extest_compat);
 	PHPC_OBJ_HANDLER_CLONE_MEMBERS(extest_compat, new_obj, old_obj);
 
 	PHPC_OBJ_HANDLER_CLONE_RETURN(new_obj);
