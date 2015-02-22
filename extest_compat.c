@@ -28,11 +28,6 @@ PHPC_OBJ_STRUCT_BEGIN(extest_compat)
 	int type;
 PHPC_OBJ_STRUCT_END()
 
-const zend_function_entry php_extest_compat_obj_funs[] = {
-	PHP_ME(ExtestCompat, test, NULL, ZEND_ACC_PUBLIC)
-	PHPC_FE_END
-};
-
 ZEND_BEGIN_ARG_INFO(arginfo_extest_compat_long, 0)
 ZEND_ARG_INFO(0, value)
 ZEND_ARG_INFO(0, fail)
@@ -42,10 +37,21 @@ ZEND_BEGIN_ARG_INFO(arginfo_extest_compat_value, 0)
 ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO(arginfo_ExtestCompat_setName, 0)
+ZEND_ARG_INFO(0, name)
+ZEND_END_ARG_INFO()
+
 const zend_function_entry extest_compat_functions[] = {
 	PHP_FE(extest_compat_long,   arginfo_extest_compat_long)
 	PHP_FE(extest_compat_str,    arginfo_extest_compat_value)
 	PHP_FE(extest_compat_array,  arginfo_extest_compat_value)
+	PHPC_FE_END
+};
+
+const zend_function_entry php_extest_compat_obj_funs[] = {
+	PHP_ME(ExtestCompat, test,       NULL,                           ZEND_ACC_PUBLIC)
+	PHP_ME(ExtestCompat, setName,    arginfo_ExtestCompat_setName,   ZEND_ACC_PUBLIC)
+	PHP_ME(ExtestCompat, getName,    NULL,                           ZEND_ACC_PUBLIC)
 	PHPC_FE_END
 };
 
@@ -117,9 +123,38 @@ PHP_MINIT_FUNCTION(extest_compat)
 /* {{{ proto ExtestCompat::test() */
 PHP_METHOD(ExtestCompat, test)
 {
-	PHPC_OBJ_STRUCT_PTR(extest_compat, intern) = PHPC_OBJ_FROM_ZVAL(getThis(), extest_compat);
+	PHPC_THIS_DECLARE_AND_FETCH(extest_compat);
 
-	php_printf("ExtestCompat TEST - name: %s, type: %d\n", intern->name, intern->type);
+	php_printf("ExtestCompat TEST - name: %s, type: %d\n", PHPC_THIS->name, PHPC_THIS->type);
+}
+/* }}} */
+
+/* {{{ proto ExtestCompat::setName($name) */
+PHP_METHOD(ExtestCompat, setName)
+{
+	char *name;
+	phpc_str_size_t name_len;
+	PHPC_THIS_DECLARE(extest_compat);
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len) == FAILURE) {
+		return;
+	}
+
+	PHPC_THIS_FETCH(extest_compat);
+
+	if (PHPC_THIS->name) {
+		efree(PHPC_THIS->name);
+	}
+	PHPC_THIS->name = estrdup(name);
+}
+/* }}} */
+
+/* {{{ proto ExtestCompat::getName() */
+PHP_METHOD(ExtestCompat, getName)
+{
+	PHPC_THIS_DECLARE_AND_FETCH(extest_compat);
+
+	RETURN_STRING(PHPC_THIS->name, 1);
 }
 /* }}} */
 
