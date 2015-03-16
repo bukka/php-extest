@@ -102,6 +102,14 @@ PHPC_OBJ_HANDLER_CLONE(extest_compat)
 	PHPC_OBJ_HANDLER_CLONE_RETURN(new_obj);
 }
 
+PHPC_OBJ_HANDLER_COMPARE(extest_compat)
+{
+	PHPC_OBJ_HANDLER_COMPARE_FETCH(extest_compat, 1, o1);
+	PHPC_OBJ_HANDLER_COMPARE_FETCH(extest_compat, 2, o2);
+
+	return strcmp(o1->name, o2->name);
+}
+
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(extest_compat)
 {
