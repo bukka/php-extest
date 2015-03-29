@@ -123,7 +123,8 @@ PHP_MINIT_FUNCTION(extest_compat)
 	PHPC_OBJ_SET_HANDLER_OFFSET(extest_compat);
 	PHPC_OBJ_SET_HANDLER_FREE(extest_compat);
 	PHPC_OBJ_SET_HANDLER_CLONE(extest_compat);
-
+	PHPC_OBJ_SET_HANDLER_COMPARE(extest_compat);
+	
 	return SUCCESS;
 }
 /* }}} */
