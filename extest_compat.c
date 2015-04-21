@@ -61,7 +61,7 @@ PHPC_OBJ_DEFINE_HANDLER_VAR(extest_compat);
 
 PHPC_OBJ_HANDLER_FREE(extest_compat)
 {
-	PHPC_OBJ_STRUCT_PTR(extest_compat, intern) = PHP_OBJ_GET_HANDLER_OBJ_FROM_ZOBJ(extest_compat);
+	PHPC_OBJ_STRUCT_DECLARE_AND_FETCH_FROM_ZOBJ(extest_compat, intern);
 
 	if (intern->name) {
 		efree(intern->name);
@@ -73,7 +73,7 @@ PHPC_OBJ_HANDLER_FREE(extest_compat)
 PHPC_OBJ_HANDLER_CREATE_EX(extest_compat)
 {
 	PHPC_OBJ_HANDLER_CREATE_EX_INIT();
-	PHPC_OBJ_STRUCT_PTR(extest_compat, intern);
+	PHPC_OBJ_STRUCT_DECLARE(extest_compat, intern);
 
 	intern = PHPC_OBJ_HANDLER_CREATE_EX_ALLOC(extest_compat);
 	PHPC_OBJ_HANDLER_INIT_CREATE_EX_PROPS(intern);
@@ -93,8 +93,8 @@ PHPC_OBJ_HANDLER_CREATE(extest_compat)
 PHPC_OBJ_HANDLER_CLONE(extest_compat)
 {
 	PHPC_OBJ_HANDLER_CLONE_INIT();
-	PHPC_OBJ_STRUCT_PTR(extest_compat, old_obj);
-	PHPC_OBJ_STRUCT_PTR(extest_compat, new_obj);
+	PHPC_OBJ_STRUCT_DECLARE(extest_compat, old_obj);
+	PHPC_OBJ_STRUCT_DECLARE(extest_compat, new_obj);
 
 	old_obj = PHPC_OBJ_FROM_SELF(extest_compat);
 	PHPC_OBJ_HANDLER_CLONE_MEMBERS(extest_compat, new_obj, old_obj);
