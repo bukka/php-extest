@@ -119,7 +119,7 @@ PHP_MINIT_FUNCTION(extest_compat)
 	INIT_CLASS_ENTRY(ce_compat, "ExtestCompat", php_extest_compat_obj_funs);
 	PHPC_CLASS_SET_HANDLER_CREATE(ce_compat, extest_compat); /* ce_compat.create_object = extest_compat_obj_create; */
 	extest_compat_ce = PHPC_CLASS_REGISTER(ce_compat);
-	memcpy(&PHPC_OBJ_GET_HANDLER_VAR_NAME(extest_compat), zend_get_std_object_handlers(), sizeof(zend_object_handlers));
+	PHPC_OBJ_INIT_HANDLERS(extest_compat);
 	PHPC_OBJ_SET_HANDLER_OFFSET(extest_compat);
 	PHPC_OBJ_SET_HANDLER_FREE(extest_compat);
 	PHPC_OBJ_SET_HANDLER_CLONE(extest_compat);
