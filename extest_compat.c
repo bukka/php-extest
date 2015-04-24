@@ -192,14 +192,22 @@ PHP_FUNCTION(extest_compat_long)
 /* }}} */
 
 static void php_extest_print_half_str(PHPC_STR_ARG(value)) { /* {{{ */
-	PHPC_STR_DECLARE(hv);
-	phpc_str_size_t hl = PHPC_STR_LEN(value) / 2;
+	PHPC_STR_DECLARE(tmp_value);
+	phpc_str_size_t tmp_len = PHPC_STR_LEN(value) / 2;
 
-	PHPC_STR_ALLOC(hv, hl);
-	memcpy(PHPC_STR_VAL(hv), PHPC_STR_VAL(value), hl);
-	PHPC_STR_VAL(hv)[hl] = '\0';
-	php_printf("half string(%" PHPC_STR_LEN_FMT ") : \"%s\"\n", PHPC_STR_LEN(hv), PHPC_STR_VAL(hv));
-	PHPC_STR_RELEASE(hv);
+	PHPC_STR_ALLOC(tmp_value, tmp_len);
+	memcpy(PHPC_STR_VAL(tmp_value), PHPC_STR_VAL(value), tmp_len);
+	PHPC_STR_VAL(tmp_value)[tmp_len] = '\0';
+	php_printf("half string(%" PHPC_STR_LEN_FMT ") : \"%s\"\n",
+			PHPC_STR_LEN(tmp_value), PHPC_STR_VAL(tmp_value));
+	tmp_len = PHPC_STR_LEN(value) * 2;
+	PHPC_STR_REALLOC(tmp_value, tmp_len);
+	memcpy(PHPC_STR_VAL(tmp_value), PHPC_STR_VAL(value), PHPC_STR_LEN(value));
+	memcpy(PHPC_STR_VAL(tmp_value) + PHPC_STR_LEN(value), PHPC_STR_VAL(value), PHPC_STR_LEN(value));
+	PHPC_STR_VAL(tmp_value)[tmp_len] = '\0';
+	php_printf("double string(%" PHPC_STR_LEN_FMT ") : \"%s\"\n",
+			PHPC_STR_LEN(tmp_value), PHPC_STR_VAL(tmp_value));
+	PHPC_STR_RELEASE(tmp_value);
 }
 /* }}} */
 

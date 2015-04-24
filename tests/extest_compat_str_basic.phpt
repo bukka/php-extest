@@ -6,4 +6,5 @@ var_dump(extest_compat_str("test data"));
 ?>
 --EXPECTF--
 half string(4) : "test"
+double string(18) : "test datatest data"
 string(9) "test data"
