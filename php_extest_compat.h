@@ -23,6 +23,8 @@ PHP_MINIT_FUNCTION(extest_compat);
 
 PHP_FUNCTION(extest_compat_long);
 PHP_FUNCTION(extest_compat_str);
+PHP_FUNCTION(extest_compat_cstr);
+PHP_FUNCTION(extest_compat_cstr_with_len);
 PHP_FUNCTION(extest_compat_array);
 
 PHP_METHOD(ExtestCompat, test);
