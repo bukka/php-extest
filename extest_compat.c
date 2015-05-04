@@ -54,6 +54,7 @@ const zend_function_entry php_extest_compat_obj_funs[] = {
 	PHP_ME(ExtestCompat, test,       NULL,                           ZEND_ACC_PUBLIC)
 	PHP_ME(ExtestCompat, setName,    arginfo_ExtestCompat_setName,   ZEND_ACC_PUBLIC)
 	PHP_ME(ExtestCompat, getName,    NULL,                           ZEND_ACC_PUBLIC)
+	PHP_ME(ExtestCompat, toArray,    NULL,                           ZEND_ACC_PUBLIC)
 	PHPC_FE_END
 };
 
@@ -163,6 +164,24 @@ PHP_METHOD(ExtestCompat, getName)
 
 	PHPC_STR_INIT(name, PHPC_THIS->name, strlen(PHPC_THIS->name));
 	PHPC_STR_RETURN(name);
+}
+/* }}} */
+
+/* {{{ proto ExtestCompat::toArray() */
+PHP_METHOD(ExtestCompat, toArray)
+{
+	HashTable *array;
+	PHPC_THIS_DECLARE(extest_compat);
+	phpc_val value;
+
+	if (zend_parse_parameters_none()) {
+		return;
+	}
+
+	PHPC_THIS_FETCH(extest_compat);
+
+	PHPC_VAL_MAKE(value);
+	PHPC_VAL_CSTR(value, PHPC_THIS->name);
 }
 /* }}} */
 
@@ -289,7 +308,6 @@ PHP_FUNCTION(extest_compat_array)
 	} PHPC_HASH_FOREACH_END();
 }
 /* }}} */
-
 
 /*
  * Local variables:
