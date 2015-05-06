@@ -173,6 +173,7 @@ PHP_METHOD(ExtestCompat, toArray)
 	HashTable *array;
 	PHPC_THIS_DECLARE(extest_compat);
 	phpc_val value;
+	zval *pzv;
 
 	if (zend_parse_parameters_none()) {
 		return;
@@ -180,8 +181,16 @@ PHP_METHOD(ExtestCompat, toArray)
 
 	PHPC_THIS_FETCH(extest_compat);
 
+	ALLOC_HASHTABLE(array);
+	zend_hash_init(array, 1, NULL, ZVAL_PTR_DTOR, 0);
+
 	PHPC_VAL_MAKE(value);
 	PHPC_VAL_CSTR(value, PHPC_THIS->name);
+	PHPC_VAL_TO_PZVAL(value, pzv);
+	PHPC_HASH_CSTR_UPDATE(array, "name", pzv);
+
+	zend_hash_destroy(array);
+	efree(array);
 }
 /* }}} */
 
