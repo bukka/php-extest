@@ -31,6 +31,7 @@ PHP_METHOD(ExtestCompat, test);
 PHP_METHOD(ExtestCompat, setName);
 PHP_METHOD(ExtestCompat, getName);
 PHP_METHOD(ExtestCompat, toArray);
+PHP_METHOD(ExtestCompat, toArrayAlt);
 
 extern const zend_function_entry extest_compat_functions[];
 

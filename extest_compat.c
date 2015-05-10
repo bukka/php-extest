@@ -55,6 +55,7 @@ const zend_function_entry php_extest_compat_obj_funs[] = {
 	PHP_ME(ExtestCompat, setName,    arginfo_ExtestCompat_setName,   ZEND_ACC_PUBLIC)
 	PHP_ME(ExtestCompat, getName,    NULL,                           ZEND_ACC_PUBLIC)
 	PHP_ME(ExtestCompat, toArray,    NULL,                           ZEND_ACC_PUBLIC)
+	PHP_ME(ExtestCompat, toArrayAlt, NULL,                           ZEND_ACC_PUBLIC)
 	PHPC_FE_END
 };
 
@@ -170,8 +171,17 @@ PHP_METHOD(ExtestCompat, getName)
 /* {{{ proto ExtestCompat::toArray() */
 PHP_METHOD(ExtestCompat, toArray)
 {
-	HashTable *array;
+	
+}
+/* }}} */
+
+/* {{{ proto ExtestCompat::toArrayAlt()
+   Alternative implementation of toArray (not recommended) */
+PHP_METHOD(ExtestCompat, toArrayAlt)
+{
+	HashTable *aht;
 	PHPC_THIS_DECLARE(extest_compat);
+	/* PHPC_STR_DECLARE(key); */
 	phpc_val value;
 	zval *pzv;
 
@@ -181,18 +191,16 @@ PHP_METHOD(ExtestCompat, toArray)
 
 	PHPC_THIS_FETCH(extest_compat);
 
-	ALLOC_HASHTABLE(array);
-	zend_hash_init(array, 1, NULL, ZVAL_PTR_DTOR, 0);
+	ALLOC_HASHTABLE(aht);
+	zend_hash_init(aht, 1, NULL, ZVAL_PTR_DTOR, 0);
 
 	PHPC_VAL_MAKE(value);
 	PHPC_VAL_CSTR(value, PHPC_THIS->name);
 	PHPC_VAL_TO_PZVAL(value, pzv);
-	PHPC_HASH_CSTR_UPDATE(array, "name", pzv);
+	PHPC_HASH_CSTR_UPDATE(aht, "name", pzv);
 
-	zend_hash_destroy(array);
-	efree(array);
+	PHPC_ARR_RETURN(aht);
 }
-/* }}} */
 
 /* {{{ proto extest_compat_long(int value)
    Scalar function test */
