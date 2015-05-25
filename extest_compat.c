@@ -45,7 +45,7 @@ const zend_function_entry extest_compat_functions[] = {
 	PHP_FE(extest_compat_long,            arginfo_extest_compat_long)
 	PHP_FE(extest_compat_str,             arginfo_extest_compat_value)
 	PHP_FE(extest_compat_cstr,            NULL)
-	PHP_FE(extest_compat_cstr_with_len,   NULL)
+	PHP_FE(extest_compat_cstrl,           NULL)
 	PHP_FE(extest_compat_array,           arginfo_extest_compat_value)
 	PHPC_FE_END
 };
@@ -171,7 +171,7 @@ PHP_METHOD(ExtestCompat, getName)
 /* {{{ proto ExtestCompat::toArray() */
 PHP_METHOD(ExtestCompat, toArray)
 {
-	
+
 }
 /* }}} */
 
@@ -276,15 +276,15 @@ PHP_FUNCTION(extest_compat_cstr)
 }
 /* }}} */
 
-/* {{{ proto extest_compat_cstr_with_len()
+/* {{{ proto extest_compat_cstrl()
    C string function test */
-PHP_FUNCTION(extest_compat_cstr_with_len)
+PHP_FUNCTION(extest_compat_cstrl)
 {
 	if (zend_parse_parameters_none()) {
 		return;
 	}
 
-	PHPC_CSTR_WITH_LEN_RETURN("cstr with len test (not visible)", 18);
+	PHPC_CSTRL_RETURN("cstr with len test (not visible)", 18);
 }
 /* }}} */
 
