@@ -325,11 +325,24 @@ PHP_FUNCTION(extest_compat_array)
 		php_var_dump(val, 1 TSRMLS_CC);
 	} PHPC_HASH_FOREACH_END();
 
-	/* custom getters */
+	/* custom ex getters */
 	PHPC_HASH_INTERNAL_POINTER_RESET_EX(Z_ARRVAL_P(arr), &pos);
 	if (PHPC_HASH_HAS_MORE_ELEMENTS_EX(Z_ARRVAL_P(arr), &pos) == SUCCESS) {
 		PHPC_HASH_GET_CURRENT_DATA_EX(Z_ARRVAL_P(arr), val, &pos);
 		PHPC_HASH_GET_CURRENT_KEY_EX(Z_ARRVAL_P(arr), key, idx, &pos);
+		if (PHPC_STR_EXISTS(key)) {
+			php_printf("key: \"%s\"\n", PHPC_STR_VAL(key));
+		} else {
+			php_printf("index: %lu\n", idx);
+		}
+		php_var_dump(val, 1 TSRMLS_CC);
+	}
+
+	/* custom getters */
+	PHPC_HASH_INTERNAL_POINTER_RESET(Z_ARRVAL_P(arr));
+	if (PHPC_HASH_HAS_MORE_ELEMENTS(Z_ARRVAL_P(arr)) == SUCCESS) {
+		PHPC_HASH_GET_CURRENT_DATA(Z_ARRVAL_P(arr), val);
+		PHPC_HASH_GET_CURRENT_KEY(Z_ARRVAL_P(arr), key, idx);
 		if (PHPC_STR_EXISTS(key)) {
 			php_printf("key: \"%s\"\n", PHPC_STR_VAL(key));
 		} else {

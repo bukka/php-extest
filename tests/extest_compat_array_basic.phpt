@@ -55,6 +55,8 @@ index: 4
 NULL
 index: 0
 string(4) "str1"
+index: 0
+string(4) "str1"
 
 ASSOC
 string(4) "str1"
@@ -82,5 +84,7 @@ key: "key4"
 bool(true)
 key: "key5"
 NULL
+key: "key1"
+string(4) "str1"
 key: "key1"
 string(4) "str1"
