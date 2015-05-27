@@ -303,6 +303,8 @@ PHP_FUNCTION(extest_compat_array)
 		return;
 	}
 
+	php_printf("array with %d elements\n", PHPC_HASH_NUM_ELEMENTS(Z_ARRVAL_P(arr)));
+
 	PHPC_HASH_FOREACH_VAL(Z_ARRVAL_P(arr), val) {
 		/*
 		 * it can be used only with phpc_val as it's ptr ptr in 5 and ptr in 7

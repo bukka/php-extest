@@ -26,8 +26,10 @@ extest_compat_array($assoc);
 ?>
 --EXPECTF--
 EMPTY
+array with 0 elements
 
 INDEXED
+array with 5 elements
 string(4) "str1"
 int(20)
 float(1.22)
@@ -59,6 +61,7 @@ index: 0
 string(4) "str1"
 
 ASSOC
+array with 5 elements
 string(4) "str1"
 int(20)
 float(1.22)
