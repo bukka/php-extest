@@ -47,6 +47,7 @@ const zend_function_entry extest_compat_functions[] = {
 	PHP_FE(extest_compat_cstr,            NULL)
 	PHP_FE(extest_compat_cstrl,           NULL)
 	PHP_FE(extest_compat_array,           arginfo_extest_compat_value)
+	PHP_FE(extest_compat_array_mod,       arginfo_extest_compat_value)
 	PHPC_FE_END
 };
 
@@ -181,7 +182,6 @@ PHP_METHOD(ExtestCompat, toArrayAlt)
 {
 	HashTable *aht;
 	PHPC_THIS_DECLARE(extest_compat);
-	/* PHPC_STR_DECLARE(key); */
 	phpc_val value;
 	zval *pzv;
 
@@ -191,8 +191,8 @@ PHP_METHOD(ExtestCompat, toArrayAlt)
 
 	PHPC_THIS_FETCH(extest_compat);
 
-	ALLOC_HASHTABLE(aht);
-	zend_hash_init(aht, 1, NULL, ZVAL_PTR_DTOR, 0);
+	PHPC_HASH_ALLOC(aht);
+	PHPC_HASH_INIT(aht, 1, NULL, ZVAL_PTR_DTOR, 0);
 
 	PHPC_VAL_MAKE(value);
 	PHPC_VAL_CSTR(value, PHPC_THIS->name);
@@ -294,7 +294,7 @@ PHP_FUNCTION(extest_compat_array)
 {
 	zval *arr;
 	phpc_ulong_t idx;
-	phpc_val *val;
+	phpc_val *ppv;
 	PHPC_STR_DECLARE(key);
 	PHPC_STR_LEN_UNUSED(key);
 	HashPosition pos;
@@ -305,56 +305,130 @@ PHP_FUNCTION(extest_compat_array)
 
 	php_printf("array with %d elements\n", PHPC_HASH_NUM_ELEMENTS(Z_ARRVAL_P(arr)));
 
-	PHPC_HASH_FOREACH_VAL(Z_ARRVAL_P(arr), val) {
+	PHPC_HASH_FOREACH_VAL(Z_ARRVAL_P(arr), ppv) {
 		/*
 		 * it can be used only with phpc_val as it's ptr ptr in 5 and ptr in 7
 		 * - the same is true for php_debug_zval_dump
 		 */
-		php_var_dump(val, 1 TSRMLS_CC);
+		php_var_dump(ppv, 1 TSRMLS_CC);
 	} PHPC_HASH_FOREACH_END();
 
-	PHPC_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(arr), key, val) {
+	PHPC_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(arr), key, ppv) {
 		php_printf("key: \"%s\"\n", PHPC_STR_EXISTS(key) ? PHPC_STR_VAL(key) : "");
-		php_var_dump(val, 1 TSRMLS_CC);
+		php_var_dump(ppv, 1 TSRMLS_CC);
 	} PHPC_HASH_FOREACH_END();
 
-	PHPC_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(arr), idx, key, val) {
+	PHPC_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(arr), idx, key, ppv) {
 		if (PHPC_STR_EXISTS(key)) {
 			php_printf("key: \"%s\"\n", PHPC_STR_VAL(key));
 		} else {
 			php_printf("index: %lu\n", idx);
 		}
-		php_var_dump(val, 1 TSRMLS_CC);
+		php_var_dump(ppv, 1 TSRMLS_CC);
 	} PHPC_HASH_FOREACH_END();
 
 	/* custom ex getters */
 	PHPC_HASH_INTERNAL_POINTER_RESET_EX(Z_ARRVAL_P(arr), &pos);
 	if (PHPC_HASH_HAS_MORE_ELEMENTS_EX(Z_ARRVAL_P(arr), &pos) == SUCCESS) {
-		PHPC_HASH_GET_CURRENT_DATA_EX(Z_ARRVAL_P(arr), val, &pos);
+		PHPC_HASH_GET_CURRENT_DATA_EX(Z_ARRVAL_P(arr), ppv, &pos);
 		PHPC_HASH_GET_CURRENT_KEY_EX(Z_ARRVAL_P(arr), key, idx, &pos);
 		if (PHPC_STR_EXISTS(key)) {
 			php_printf("key: \"%s\"\n", PHPC_STR_VAL(key));
 		} else {
 			php_printf("index: %lu\n", idx);
 		}
-		php_var_dump(val, 1 TSRMLS_CC);
+		php_var_dump(ppv, 1 TSRMLS_CC);
 	}
 
 	/* custom getters */
 	PHPC_HASH_INTERNAL_POINTER_RESET(Z_ARRVAL_P(arr));
 	if (PHPC_HASH_HAS_MORE_ELEMENTS(Z_ARRVAL_P(arr)) == SUCCESS) {
-		PHPC_HASH_GET_CURRENT_DATA(Z_ARRVAL_P(arr), val);
+		PHPC_HASH_GET_CURRENT_DATA(Z_ARRVAL_P(arr), ppv);
 		PHPC_HASH_GET_CURRENT_KEY(Z_ARRVAL_P(arr), key, idx);
 		if (PHPC_STR_EXISTS(key)) {
 			php_printf("key: \"%s\"\n", PHPC_STR_VAL(key));
 		} else {
 			php_printf("index: %lu\n", idx);
 		}
-		php_var_dump(val, 1 TSRMLS_CC);
+		php_var_dump(ppv, 1 TSRMLS_CC);
 	}
 }
 /* }}} */
 
+/* {{{ proto extest_compat_array_mod(string value)
+   Array function test */
+PHP_FUNCTION(extest_compat_array_mod)
+{
+	zval *arr, *pzv;
+	phpc_val *ppv, pv;
+	PHPC_STR_DECLARE(key);
+	PHPC_STR_LEN_UNUSED(key);
+	HashTable *aht;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &arr) == FAILURE) {
+		return;
+	}
+
+	aht = Z_ARRVAL_P(arr);
+
+	/* index */
+	if (PHPC_HASH_INDEX_EXISTS(aht, 1)) {
+		PHPC_HASH_INDEX_FIND(aht, 1, ppv);
+		php_printf("Deleting value 1:\n");
+		php_var_dump(ppv, 1 TSRMLS_CC);
+		PHPC_HASH_INDEX_DELETE(aht, 1);
+		php_printf("Value exists : %s\n", PHPC_HASH_INDEX_EXISTS(aht, 1) ? "yes" : "no");
+
+		PHPC_VAL_MAKE(pv);
+		PHPC_VAL_CSTR(pv, "index1");
+		PHPC_VAL_TO_PZVAL(pv, pzv);
+		PHPC_HASH_INDEX_UPDATE(aht, 1, pzv);
+	}
+
+	/* cstr */
+	if (PHPC_HASH_CSTR_EXISTS(aht, "key1")) {
+		PHPC_HASH_CSTR_FIND(aht, "key1", ppv);
+		php_printf("Deleting value key1:\n");
+		php_var_dump(ppv, 1 TSRMLS_CC);
+		PHPC_HASH_CSTR_DELETE(aht, "key1");
+		php_printf("Value exists : %s\n", PHPC_HASH_CSTR_EXISTS(aht, "key1") ? "yes" : "no");
+
+		PHPC_VAL_MAKE(pv);
+		PHPC_VAL_CSTR(pv, "key1v");
+		PHPC_VAL_TO_PZVAL(pv, pzv);
+		PHPC_HASH_CSTR_UPDATE(aht, "key1", pzv);
+	}
+
+	/* cstrl */
+	if (PHPC_HASH_CSTRL_EXISTS(aht, "key2", 4)) {
+		PHPC_HASH_CSTRL_FIND(aht, "key2", 4, ppv);
+		php_printf("Deleting value key2:\n");
+		php_var_dump(ppv, 1 TSRMLS_CC);
+		PHPC_HASH_CSTRL_DELETE(aht, "key2", 4);
+		php_printf("Value exists : %s\n", PHPC_HASH_CSTRL_EXISTS(aht, "key2", 4) ? "yes" : "no");
+
+		PHPC_VAL_MAKE(pv);
+		PHPC_VAL_CSTR(pv, "key2v");
+		PHPC_VAL_TO_PZVAL(pv, pzv);
+		PHPC_HASH_CSTRL_UPDATE(aht, "key2", 4, pzv);
+	}
+
+	/* str */
+	PHPC_STR_INIT(key, "key3", 4);
+	if (PHPC_HASH_STR_EXISTS(aht, key)) {
+		PHPC_HASH_STR_FIND(aht, key, ppv);
+		php_printf("Deleting value key3:\n");
+		php_var_dump(ppv, 1 TSRMLS_CC);
+		PHPC_HASH_STR_DELETE(aht, key);
+		php_printf("Value exists : %s\n", PHPC_HASH_STR_EXISTS(aht, key) ? "yes" : "no");
+
+		PHPC_VAL_MAKE(pv);
+		PHPC_VAL_CSTR(pv, "key3v");
+		PHPC_VAL_TO_PZVAL(pv, pzv);
+		PHPC_HASH_STR_UPDATE(aht, key, pzv);
+	}
+	PHPC_STR_RELEASE(key);
+}
 /*
  * Local variables:
  * tab-width: 4

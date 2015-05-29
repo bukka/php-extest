@@ -26,6 +26,7 @@ PHP_FUNCTION(extest_compat_str);
 PHP_FUNCTION(extest_compat_cstr);
 PHP_FUNCTION(extest_compat_cstrl);
 PHP_FUNCTION(extest_compat_array);
+PHP_FUNCTION(extest_compat_array_mod);
 
 PHP_METHOD(ExtestCompat, test);
 PHP_METHOD(ExtestCompat, setName);
