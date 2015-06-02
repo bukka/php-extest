@@ -53,6 +53,7 @@ const zend_function_entry extest_compat_functions[] = {
 
 const zend_function_entry php_extest_compat_obj_funs[] = {
 	PHP_ME(ExtestCompat, test,       NULL,                           ZEND_ACC_PUBLIC)
+	PHP_ME(ExtestCompat, readProp,   NULL,                           ZEND_ACC_PUBLIC)
 	PHP_ME(ExtestCompat, setName,    arginfo_ExtestCompat_setName,   ZEND_ACC_PUBLIC)
 	PHP_ME(ExtestCompat, getName,    NULL,                           ZEND_ACC_PUBLIC)
 	PHP_ME(ExtestCompat, toArray,    NULL,                           ZEND_ACC_PUBLIC)
@@ -117,13 +118,16 @@ PHP_MINIT_FUNCTION(extest_compat)
 
 	/* init classes */
 	INIT_CLASS_ENTRY(ce_compat, "ExtestCompat", php_extest_compat_obj_funs);
-	PHPC_CLASS_SET_HANDLER_CREATE(ce_compat, extest_compat); /* ce_compat.create_object = extest_compat_obj_create; */
+	PHPC_CLASS_SET_HANDLER_CREATE(ce_compat, extest_compat);
 	extest_compat_ce = PHPC_CLASS_REGISTER(ce_compat);
 	PHPC_OBJ_INIT_HANDLERS(extest_compat);
 	PHPC_OBJ_SET_HANDLER_OFFSET(extest_compat);
 	PHPC_OBJ_SET_HANDLER_FREE(extest_compat);
 	PHPC_OBJ_SET_HANDLER_CLONE(extest_compat);
 	PHPC_OBJ_SET_HANDLER_COMPARE(extest_compat);
+
+	zend_declare_property_null(extest_compat_ce,
+			"prop", sizeof("prop")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 
 	return SUCCESS;
 }
@@ -135,6 +139,26 @@ PHP_METHOD(ExtestCompat, test)
 	PHPC_THIS_DECLARE_AND_FETCH(extest_compat);
 
 	php_printf("ExtestCompat TEST - name: %s, type: %d\n", PHPC_THIS->name, PHPC_THIS->type);
+}
+/* }}} */
+
+/* {{{ proto ExtestCompat::readProp() */
+PHP_METHOD(ExtestCompat, readProp)
+{
+	PHPC_THIS_DECLARE_AND_FETCH(extest_compat);
+	zval *prop;
+	PHPC_READ_PROPERTY_RV_DECLARE;
+
+	prop = PHPC_READ_PROPERTY(extest_compat_ce, getThis(), "prop", sizeof("prop")-1, 1);
+
+	if (Z_TYPE_P(prop) != IS_STRING) {
+		zend_update_property_string(extest_compat_ce, getThis(),
+			"prop", sizeof("prop")-1, "unknown" TSRMLS_CC);
+
+		PHPC_CSTR_RETURN("unknown");
+	}
+
+	RETURN_ZVAL(prop, 1, 0);
 }
 /* }}} */
 

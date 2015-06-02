@@ -6,5 +6,7 @@ $ec = new ExtestCompat();
 var_dump($ec);
 ?>
 --EXPECT--
-object(ExtestCompat)#1 (0) {
+object(ExtestCompat)#1 (1) {
+  ["prop"]=>
+  NULL
 }

@@ -29,6 +29,7 @@ PHP_FUNCTION(extest_compat_array);
 PHP_FUNCTION(extest_compat_array_mod);
 
 PHP_METHOD(ExtestCompat, test);
+PHP_METHOD(ExtestCompat, readProp);
 PHP_METHOD(ExtestCompat, setName);
 PHP_METHOD(ExtestCompat, getName);
 PHP_METHOD(ExtestCompat, toArray);

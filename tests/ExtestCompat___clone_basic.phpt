@@ -11,9 +11,15 @@ $eccc = clone $ec;
 var_dump($eccc);
 ?>
 --EXPECT--
-object(ExtestCompat)#1 (0) {
+object(ExtestCompat)#1 (1) {
+  ["prop"]=>
+  NULL
 }
-object(ExtestCompat)#2 (0) {
+object(ExtestCompat)#2 (1) {
+  ["prop"]=>
+  NULL
 }
-object(ExtestCompat)#3 (0) {
+object(ExtestCompat)#3 (1) {
+  ["prop"]=>
+  NULL
 }
