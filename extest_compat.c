@@ -196,7 +196,15 @@ PHP_METHOD(ExtestCompat, getName)
 /* {{{ proto ExtestCompat::toArray() */
 PHP_METHOD(ExtestCompat, toArray)
 {
+	PHPC_THIS_DECLARE(extest_compat);
 
+	if (zend_parse_parameters_none()) {
+		return;
+	}
+
+	PHPC_THIS_FETCH(extest_compat);
+
+	PHPC_ARRAY_INIT_SIZE(return_value, 1);
 }
 /* }}} */
 
@@ -223,7 +231,7 @@ PHP_METHOD(ExtestCompat, toArrayAlt)
 	PHPC_VAL_TO_PZVAL(value, pzv);
 	PHPC_HASH_CSTR_UPDATE(aht, "name", pzv);
 
-	PHPC_ARR_RETURN(aht);
+	PHPC_HASH_RETURN(aht);
 }
 
 /* {{{ proto extest_compat_long(int value)
