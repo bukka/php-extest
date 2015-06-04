@@ -205,6 +205,7 @@ PHP_METHOD(ExtestCompat, toArray)
 	PHPC_THIS_FETCH(extest_compat);
 
 	PHPC_ARRAY_INIT_SIZE(return_value, 1);
+	PHPC_ARRAY_ADD_ASSOC_CSTR(return_value, "name", PHPC_THIS->name);
 }
 /* }}} */
 
