@@ -480,7 +480,7 @@ PHP_FUNCTION(extest_compat_array_gen)
 	PHPC_ARRAY_ADD_NEXT_INDEX_STR(return_value, str);
 	PHPC_ARRAY_ADD_NEXT_INDEX_CSTR(return_value, "cstr_next_index_val");
 	PHPC_ARRAY_ADD_NEXT_INDEX_CSTRL(return_value,
-			"cstrl_next_index_val", sizeof("cstrl_next_index_val"));
+			"cstrl_next_index_val", sizeof("cstrl_next_index_val")-1);
 	PHPC_VAL_MAKE(pv);
 	PHPC_VAL_CSTR(pv, "zval_next_index_val");
 	PHPC_ARRAY_ADD_NEXT_INDEX_VAL(return_value, pv);
@@ -492,7 +492,7 @@ PHP_FUNCTION(extest_compat_array_gen)
 	PHPC_ARRAY_ADD_INDEX_STR(return_value, 13, str);
 	PHPC_ARRAY_ADD_INDEX_CSTR(return_value, 14, "cstr_index_val");
 	PHPC_ARRAY_ADD_INDEX_CSTRL(return_value, 15,
-			"cstrl_index_val", sizeof("cstrl_index_val"));
+			"cstrl_index_val", sizeof("cstrl_index_val")-1);
 	PHPC_VAL_MAKE(pv);
 	PHPC_VAL_CSTR(pv, "zval_val");
 	PHPC_ARRAY_ADD_INDEX_VAL(return_value, 16, pv);
@@ -504,7 +504,7 @@ PHP_FUNCTION(extest_compat_array_gen)
 	PHPC_ARRAY_ADD_ASSOC_STR(return_value, "str", str);
 	PHPC_ARRAY_ADD_ASSOC_CSTR(return_value, "cstr", "cstr_assoc_val");
 	PHPC_ARRAY_ADD_ASSOC_CSTRL(return_value, "cstrl",
-			"cstrl_assoc_val", sizeof("cstrl_assoc_val"));
+			"cstrl_assoc_val", sizeof("cstrl_assoc_val")-1);
 	PHPC_VAL_MAKE(pv);
 	PHPC_VAL_CSTR(pv, "zval_assoc_val");
 	PHPC_ARRAY_ADD_ASSOC_VAL(return_value, "zval", pv);
