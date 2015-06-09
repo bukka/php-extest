@@ -258,7 +258,30 @@ PHP_FUNCTION(extest_compat_long)
 }
 /* }}} */
 
-static void php_extest_print_half_str(PHPC_STR_ARG(value)) { /* {{{ */
+static void php_extest_print_str_val(PHPC_STR_ARG_VAL(value)) { /* {{{ */
+	PHPC_STR_LEN_DECLARE_AND_FETCH(value);
+
+	php_printf("str_val(%" PHPC_STR_LEN_FMT "): %s\n", PHPC_STR_LEN(value), PHPC_STR_VAL(value));
+}
+/* }}} */
+
+static void php_extest_print_str_ptr_val(PHPC_STR_ARG_PTR_VAL(pvalue)) { /* {{{ */
+	PHPC_STR_DECLARE(value);
+	PHPC_STR_FROM_PTR_VAL(value, pvalue);
+
+	php_printf("str_ptr_val(%" PHPC_STR_LEN_FMT "): %s\n", PHPC_STR_LEN(value), PHPC_STR_VAL(value));
+}
+/* }}} */
+
+static void php_extest_print_str_ptr(PHPC_STR_ARG_PTR(pvalue)) { /* {{{ */
+	PHPC_STR_DECLARE(value);
+	PHPC_STR_FROM_PTR_STR(value, pvalue);
+
+	php_printf("str_ptr(%" PHPC_STR_LEN_FMT "): %s\n", PHPC_STR_LEN(value), PHPC_STR_VAL(value));
+}
+/* }}} */
+
+static void php_extest_print_mult_str(PHPC_STR_ARG(value)) { /* {{{ */
 	PHPC_STR_DECLARE(tmp_value);
 	phpc_str_size_t tmp_len = PHPC_STR_LEN(value) / 2;
 
@@ -292,7 +315,10 @@ PHP_FUNCTION(extest_compat_str)
 
 	PHPC_STR_INIT(value, cstr, len);
 
-	php_extest_print_half_str(PHPC_STR_PASS(value));
+	php_extest_print_str_val(PHPC_STR_PASS_VAL(value));
+	php_extest_print_str_ptr_val(PHPC_STR_PASS_PTR_VAL(value));
+	php_extest_print_str_ptr(PHPC_STR_PASS_PTR(value));
+	php_extest_print_mult_str(PHPC_STR_PASS(value));
 
 	PHPC_STR_RETURN(value);
 }
