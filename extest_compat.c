@@ -236,23 +236,48 @@ PHP_METHOD(ExtestCompat, toArrayAlt)
 	PHPC_HASH_RETURN(aht);
 }
 
-/* {{{ proto extest_compat_long(int value)
+/* {{{ proto extest_compat_long(int value, string str, boolean fail)
    Scalar function test */
 PHP_FUNCTION(extest_compat_long)
 {
 	phpc_long_t value;
 	long lv;
+	int iv;
+	char *cstr;
+	phpc_str_size_t len;
 	zend_bool fail;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "lb", &value, &fail) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "lsb", &value, &cstr, &len, &fail) == FAILURE) {
 		return;
 	}
+
+	if (fail) {
+		PHPC_SIZE_TO_LONG_EX(len, lv, RETURN_FALSE);
+	} else {
+		PHPC_SIZE_TO_LONG(len, lv);
+	}
+
+	if (fail) {
+		PHPC_SIZE_TO_INT_EX(len, iv, RETURN_FALSE);
+	} else {
+		PHPC_SIZE_TO_INT(len, iv);
+	}
+
+	php_printf("SIZE - long: %ld; int: %d\n", lv, iv);
 
 	if (fail) {
 		PHPC_LONG_TO_LONG_EX(value, lv, RETURN_FALSE);
 	} else {
 		PHPC_LONG_TO_LONG(value, lv);
 	}
+
+	if (fail) {
+		PHPC_LONG_TO_INT_EX(value, iv, RETURN_FALSE);
+	} else {
+		PHPC_LONG_TO_INT(value, iv);
+	}
+
+	php_printf("LONG - long: %ld; int: %d\n", lv, iv);
 
 	RETURN_LONG(lv);
 }
