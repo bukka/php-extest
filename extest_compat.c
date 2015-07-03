@@ -112,6 +112,14 @@ PHPC_OBJ_HANDLER_COMPARE(extest_compat)
 	return strcmp(PHPC_THIS->name, PHPC_THAT->name);
 }
 
+PHPC_OBJ_HANDLER_GET_GC(extest_compat)
+{
+	*PHPC_GC_TABLE = NULL;
+	*PHPC_GC_N = 0;
+
+	return zend_std_get_properties(PHPC_SELF TSRMLS_CC);
+}
+
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(extest_compat)
 {
@@ -126,6 +134,7 @@ PHP_MINIT_FUNCTION(extest_compat)
 	PHPC_OBJ_SET_HANDLER_FREE(extest_compat);
 	PHPC_OBJ_SET_HANDLER_CLONE(extest_compat);
 	PHPC_OBJ_SET_HANDLER_COMPARE(extest_compat);
+	PHPC_OBJ_SET_HANDLER_GET_GC(extest_compat);
 
 	zend_declare_property_null(extest_compat_ce,
 			"prop", sizeof("prop")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
