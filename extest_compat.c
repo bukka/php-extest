@@ -120,6 +120,42 @@ PHPC_OBJ_HANDLER_GET_GC(extest_compat)
 	return zend_std_get_properties(PHPC_SELF TSRMLS_CC);
 }
 
+PHPC_OBJ_HANDLER_GET_DEBUG_INFO(extest_compat)
+{
+	HashTable *props;
+	phpc_val value;
+	zval *pzv;
+	PHPC_THIS_DECLARE_AND_FETCH_FROM_SELF(extest_compat);
+
+	*PHPC_DEBUG_INFO_IS_TEMP = 0;
+
+	props = zend_std_get_properties(PHPC_SELF TSRMLS_CC);
+
+	PHPC_VAL_MAKE(value);
+	PHPC_VAL_CSTR(value, PHPC_THIS->name);
+	PHPC_VAL_TO_PZVAL(value, pzv);
+	PHPC_HASH_CSTR_UPDATE(props, "name_debug", pzv);
+
+	return props;
+}
+
+PHPC_OBJ_HANDLER_GET_PROPERTIES(extest_compat)
+{
+	HashTable *props;
+	phpc_val value;
+	zval *pzv;
+	PHPC_THIS_DECLARE_AND_FETCH_FROM_SELF(extest_compat);
+
+	props = zend_std_get_properties(PHPC_SELF TSRMLS_CC);
+
+	PHPC_VAL_MAKE(value);
+	PHPC_VAL_CSTR(value, PHPC_THIS->name);
+	PHPC_VAL_TO_PZVAL(value, pzv);
+	PHPC_HASH_CSTR_UPDATE(props, "name", pzv);
+
+	return props;
+}
+
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(extest_compat)
 {
@@ -135,6 +171,8 @@ PHP_MINIT_FUNCTION(extest_compat)
 	PHPC_OBJ_SET_HANDLER_CLONE(extest_compat);
 	PHPC_OBJ_SET_HANDLER_COMPARE(extest_compat);
 	PHPC_OBJ_SET_HANDLER_GET_GC(extest_compat);
+	PHPC_OBJ_SET_HANDLER_GET_DEBUG_INFO(extest_compat);
+	PHPC_OBJ_SET_HANDLER_GET_PROPERTIES(extest_compat);
 
 	zend_declare_property_null(extest_compat_ce,
 			"prop", sizeof("prop")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
