@@ -46,6 +46,8 @@ const zend_function_entry extest_compat_functions[] = {
 	PHP_FE(extest_compat_str,             arginfo_extest_compat_value)
 	PHP_FE(extest_compat_cstr,            NULL)
 	PHP_FE(extest_compat_cstrl,           NULL)
+	PHP_FE(extest_compat_cstr_rv,         NULL)
+	PHP_FE(extest_compat_cstrl_rv,        NULL)
 	PHP_FE(extest_compat_array,           arginfo_extest_compat_value)
 	PHP_FE(extest_compat_array_mod,       arginfo_extest_compat_value)
 	PHP_FE(extest_compat_array_gen,       NULL)
@@ -400,10 +402,6 @@ PHP_FUNCTION(extest_compat_str)
    C string function test */
 PHP_FUNCTION(extest_compat_cstr)
 {
-	if (zend_parse_parameters_none()) {
-		return;
-	}
-
 	PHPC_CSTR_RETURN("cstr test");
 }
 /* }}} */
@@ -412,11 +410,31 @@ PHP_FUNCTION(extest_compat_cstr)
    C string function test */
 PHP_FUNCTION(extest_compat_cstrl)
 {
-	if (zend_parse_parameters_none()) {
-		return;
-	}
-
 	PHPC_CSTRL_RETURN("cstr with len test (not visible)", 18);
+}
+/* }}} */
+
+/* {{{ proto extest_compat_cstr_rv()
+   C string function test */
+PHP_FUNCTION(extest_compat_cstr_rv)
+{
+	char *test = (char *) malloc(14);
+	strcpy(test, "cstr_rv test");
+	test[13] = '\0';
+
+	PHPC_CSTR_RETVAL(test);
+	free(test);
+}
+/* }}} */
+
+/* {{{ proto extest_compat_cstrl_rv()
+   C string function test */
+PHP_FUNCTION(extest_compat_cstrl_rv)
+{
+	char *test = strdup("cstr_rv with len test (not visible)");
+
+	PHPC_CSTRL_RETVAL(test, 21);
+	free(test);
 }
 /* }}} */
 
