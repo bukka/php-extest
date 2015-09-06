@@ -1,5 +1,5 @@
 --TEST--
-Test function extest_compat_array_mod() by calling it with its expected arguments
+Test function extest_compat_array_mod() by calling it with its expected argument
 --FILE--
 <?php
 $empty = array();

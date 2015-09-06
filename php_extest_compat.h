@@ -30,6 +30,7 @@ PHP_FUNCTION(extest_compat_cstrl_rv);
 PHP_FUNCTION(extest_compat_array);
 PHP_FUNCTION(extest_compat_array_mod);
 PHP_FUNCTION(extest_compat_array_gen);
+PHP_FUNCTION(extest_compat_array_copy);
 
 PHP_METHOD(ExtestCompat, test);
 PHP_METHOD(ExtestCompat, readProp);

@@ -51,6 +51,7 @@ const zend_function_entry extest_compat_functions[] = {
 	PHP_FE(extest_compat_array,           arginfo_extest_compat_value)
 	PHP_FE(extest_compat_array_mod,       arginfo_extest_compat_value)
 	PHP_FE(extest_compat_array_gen,       NULL)
+	PHP_FE(extest_compat_array_copy,      arginfo_extest_compat_value)
 	PHPC_FE_END
 };
 
@@ -638,6 +639,26 @@ PHP_FUNCTION(extest_compat_array_gen)
 	PHPC_VAL_CSTR(pv, "zval_assoc_val_ex");
 	PHPC_ARRAY_ADD_ASSOC_VAL_EX(return_value, "zval_ex", sizeof("zval_ex")-1, pv);
 }
+
+/* {{{ proto extest_compat_array_copy($value)
+   Array function test for copying array value */
+PHP_FUNCTION(extest_compat_array_copy)
+{
+	zval *arr;
+	HashTable *aht, *aht_copy;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &arr) == FAILURE) {
+		return;
+	}
+
+	aht = Z_ARRVAL_P(arr);
+
+	PHPC_HASH_ALLOC(aht_copy);
+	PHPC_HASH_INIT(aht_copy, 1, NULL, ZVAL_PTR_DTOR, 0);
+	PHPC_HASH_COPY(aht_copy, aht);
+	PHPC_HASH_RETURN(aht_copy);
+}
+
 /*
  * Local variables:
  * tab-width: 4
