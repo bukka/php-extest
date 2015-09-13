@@ -484,7 +484,8 @@ PHP_FUNCTION(extest_compat_array)
 		PHPC_HASH_GET_CURRENT_DATA_EX(Z_ARRVAL_P(arr), ppv, &pos);
 		PHPC_HASH_GET_CURRENT_KEY_EX(Z_ARRVAL_P(arr), key, idx, &pos);
 		if (PHPC_STR_EXISTS(key)) {
-			php_printf("key: \"%s\"\n", PHPC_STR_VAL(key));
+			php_printf("key: \"%s\" (len: %"PHPC_STR_LEN_FMT")\n",
+					PHPC_STR_VAL(key), PHPC_STR_LEN(key));
 		} else {
 			php_printf("index: %lu\n", idx);
 		}

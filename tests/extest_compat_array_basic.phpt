@@ -87,7 +87,7 @@ key: "key4"
 bool(true)
 key: "key5"
 NULL
-key: "key1"
+key: "key1" (len: 4)
 string(4) "str1"
 key: "key1"
 string(4) "str1"
