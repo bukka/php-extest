@@ -37,6 +37,11 @@ ZEND_BEGIN_ARG_INFO(arginfo_extest_compat_value, 0)
 ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
+
+ZEND_BEGIN_ARG_INFO(arginfo_extest_compat_fcall, 0)
+ZEND_ARG_INFO(0, callback)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO(arginfo_ExtestCompat_setName, 0)
 ZEND_ARG_INFO(0, name)
 ZEND_END_ARG_INFO()
@@ -52,6 +57,7 @@ const zend_function_entry extest_compat_functions[] = {
 	PHP_FE(extest_compat_array_mod,       arginfo_extest_compat_value)
 	PHP_FE(extest_compat_array_gen,       NULL)
 	PHP_FE(extest_compat_array_copy,      arginfo_extest_compat_value)
+	PHP_FE(extest_compat_fcall,           arginfo_extest_compat_fcall)
 	PHPC_FE_END
 };
 
@@ -658,6 +664,36 @@ PHP_FUNCTION(extest_compat_array_copy)
 	PHPC_HASH_INIT(aht_copy, 1, NULL, ZVAL_PTR_DTOR, 0);
 	PHPC_HASH_COPY(aht_copy, aht);
 	PHPC_HASH_RETURN(aht_copy);
+}
+
+/* proto extest_compat_fcall($callback)
+   Call function */
+PHP_FUNCTION(extest_compat_fcall)
+{
+	PHPC_FCALL_PARAMS_DECLARE(callback, 2);
+	zend_fcall_info fci;
+	zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
+	phpc_val retval;
+
+	PHPC_FCALL_PARAMS_INIT(callback);
+	/* param 0 is null */
+	PHPC_VAL_UNDEF(PHPC_FCALL_PARAM_VAL(callback, 0));
+	/* param 1 is string */
+	PHPC_VAL_MAKE(PHPC_FCALL_PARAM_VAL(callback, 1));
+	PHPC_VAL_CSTR(PHPC_FCALL_PARAM_VAL(callback, 1), "param");
+	/* set fci */
+	PHPC_FCALL_RETVAL(fci, retval);
+	fci.params = PHPC_FCALL_PARAMS_NAME(callback);
+	fci.param_count = 2;
+	fci.no_separation = 1;
+
+	if (zend_call_function(&fci, &fci_cache TSRMLS_CC) != SUCCESS || PHPC_VAL_ISUNDEF(retval)) {
+		php_printf("FCALL failed\n");
+	}
+
+	zval_ptr_dtor(&PHPC_FCALL_PARAM_VAL(callback, 1));
+	zval_ptr_dtor(&retval);
+
 }
 
 /*
