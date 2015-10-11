@@ -291,6 +291,7 @@ PHP_METHOD(ExtestCompat, toArrayAlt)
 
 	PHPC_HASH_RETURN(aht);
 }
+/* }}} */
 
 /* {{{ proto extest_compat_long(int value, string str, boolean fail)
    Scalar function test */
@@ -587,6 +588,7 @@ PHP_FUNCTION(extest_compat_array_mod)
 	}
 	PHPC_STR_RELEASE(key);
 }
+/* }}} */
 
 /* {{{ proto extest_compat_array_gen()
    Array function test for adding values */
@@ -646,6 +648,7 @@ PHP_FUNCTION(extest_compat_array_gen)
 	PHPC_VAL_CSTR(pv, "zval_assoc_val_ex");
 	PHPC_ARRAY_ADD_ASSOC_VAL_EX(return_value, "zval_ex", sizeof("zval_ex")-1, pv);
 }
+/* }}} */
 
 /* {{{ proto extest_compat_array_copy($value)
    Array function test for copying array value */
@@ -665,8 +668,9 @@ PHP_FUNCTION(extest_compat_array_copy)
 	PHPC_HASH_COPY(aht_copy, aht);
 	PHPC_HASH_RETURN(aht_copy);
 }
+/* }}} */
 
-/* proto extest_compat_fcall($callback)
+/* {{{ proto extest_compat_fcall($callback)
    Call function */
 PHP_FUNCTION(extest_compat_fcall)
 {
@@ -695,6 +699,7 @@ PHP_FUNCTION(extest_compat_fcall)
 	zval_ptr_dtor(&retval);
 
 }
+/* }}} */
 
 /*
  * Local variables:
