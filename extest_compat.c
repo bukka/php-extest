@@ -679,9 +679,14 @@ PHP_FUNCTION(extest_compat_fcall)
 	zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
 	phpc_val retval;
 
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "f", &fci, &fci_cache) == FAILURE) {
+		return;
+	}
+
 	PHPC_FCALL_PARAMS_INIT(callback);
 	/* param 0 is null */
-	PHPC_VAL_UNDEF(PHPC_FCALL_PARAM_VAL(callback, 0));
+	PHPC_VAL_MAKE(PHPC_FCALL_PARAM_VAL(callback, 0));
+	ZVAL_LONG(PHPC_FCALL_PARAM_PZVAL(callback, 0), 11);
 	/* param 1 is string */
 	PHPC_VAL_MAKE(PHPC_FCALL_PARAM_VAL(callback, 1));
 	PHPC_VAL_CSTR(PHPC_FCALL_PARAM_VAL(callback, 1), "param");
@@ -695,6 +700,7 @@ PHP_FUNCTION(extest_compat_fcall)
 		php_printf("FCALL failed\n");
 	}
 
+	zval_ptr_dtor(&PHPC_FCALL_PARAM_VAL(callback, 0));
 	zval_ptr_dtor(&PHPC_FCALL_PARAM_VAL(callback, 1));
 	zval_ptr_dtor(&retval);
 

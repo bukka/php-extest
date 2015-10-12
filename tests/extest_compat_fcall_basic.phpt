@@ -9,4 +9,6 @@ function test($a, $b) {
 var_dump(extest_compat_fcall("test"));
 ?>
 --EXPECTF--
-
+int(11)
+string(5) "param"
+NULL
