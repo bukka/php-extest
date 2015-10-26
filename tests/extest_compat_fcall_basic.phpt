@@ -1,14 +1,15 @@
 --TEST--
-Test function extest_compat_cstrl_rv() by calling it
+Test function extest_compat_fcall() by calling it with its expected argument
 --FILE--
 <?php
-function test($a, $b) {
-	var_dump($a, $b);
+function test($a, $b, $c) {
+	var_dump(isset($a), $b, $c);
 }
 
 var_dump(extest_compat_fcall("test"));
 ?>
 --EXPECTF--
+bool(false)
 int(11)
 string(5) "param"
 NULL

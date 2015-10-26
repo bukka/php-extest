@@ -674,7 +674,7 @@ PHP_FUNCTION(extest_compat_array_copy)
    Call function */
 PHP_FUNCTION(extest_compat_fcall)
 {
-	PHPC_FCALL_PARAMS_DECLARE(callback, 2);
+	PHPC_FCALL_PARAMS_DECLARE(callback, 3);
 	zend_fcall_info fci;
 	zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
 	phpc_val retval;
@@ -686,14 +686,17 @@ PHP_FUNCTION(extest_compat_fcall)
 	PHPC_FCALL_PARAMS_INIT(callback);
 	/* param 0 is null */
 	PHPC_VAL_MAKE(PHPC_FCALL_PARAM_VAL(callback, 0));
-	ZVAL_LONG(PHPC_FCALL_PARAM_PZVAL(callback, 0), 11);
-	/* param 1 is string */
+	PHPC_FCALL_PARAM_UNDEF(callback, 0);
+	/* param 1 is int */
 	PHPC_VAL_MAKE(PHPC_FCALL_PARAM_VAL(callback, 1));
-	PHPC_VAL_CSTR(PHPC_FCALL_PARAM_VAL(callback, 1), "param");
+	ZVAL_LONG(PHPC_FCALL_PARAM_PZVAL(callback, 1), 11);
+	/* param 1 is string */
+	PHPC_VAL_MAKE(PHPC_FCALL_PARAM_VAL(callback, 2));
+	PHPC_VAL_CSTR(PHPC_FCALL_PARAM_VAL(callback, 2), "param");
 	/* set fci */
 	PHPC_FCALL_RETVAL(fci, retval);
 	fci.params = PHPC_FCALL_PARAMS_NAME(callback);
-	fci.param_count = 2;
+	fci.param_count = 3;
 	fci.no_separation = 1;
 
 	if (zend_call_function(&fci, &fci_cache TSRMLS_CC) != SUCCESS || PHPC_VAL_ISUNDEF(retval)) {
@@ -702,6 +705,7 @@ PHP_FUNCTION(extest_compat_fcall)
 
 	zval_ptr_dtor(&PHPC_FCALL_PARAM_VAL(callback, 0));
 	zval_ptr_dtor(&PHPC_FCALL_PARAM_VAL(callback, 1));
+	zval_ptr_dtor(&PHPC_FCALL_PARAM_VAL(callback, 2));
 	zval_ptr_dtor(&retval);
 
 }
