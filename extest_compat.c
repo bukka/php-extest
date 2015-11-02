@@ -165,6 +165,20 @@ PHPC_OBJ_HANDLER_GET_PROPERTIES(extest_compat)
 	return props;
 }
 
+typedef struct extest_compat_res_entry_struct {
+	char *name;
+} extest_compat_res_entry;
+
+static int extest_compat_res_index;
+
+static void php_extest_compat_res_free(phpc_res_entry_t *rsrc TSRMLS_DC) /* {{{ */
+{
+	extest_compat_res_entry *entry = (extest_compat_res_entry *) rsrc->ptr;
+	efree(entry->name);
+	efree(entry);
+}
+/* }}} */
+
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(extest_compat)
 {
@@ -185,6 +199,9 @@ PHP_MINIT_FUNCTION(extest_compat)
 
 	zend_declare_property_null(extest_compat_ce,
 			"prop", sizeof("prop")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
+
+	extest_compat_res_index = zend_register_list_destructors_ex(
+				php_extest_compat_res_free, NULL, "Extest Compat", module_number);
 
 	return SUCCESS;
 }
