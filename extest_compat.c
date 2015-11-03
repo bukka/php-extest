@@ -42,7 +42,7 @@ ZEND_BEGIN_ARG_INFO(arginfo_extest_compat_fcall, 0)
 ZEND_ARG_INFO(0, callback)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO(arginfo_ExtestCompat_setName, 0)
+ZEND_BEGIN_ARG_INFO(arginfo_extest_compat_name, 0)
 ZEND_ARG_INFO(0, name)
 ZEND_END_ARG_INFO()
 
@@ -58,13 +58,14 @@ const zend_function_entry extest_compat_functions[] = {
 	PHP_FE(extest_compat_array_gen,       NULL)
 	PHP_FE(extest_compat_array_copy,      arginfo_extest_compat_value)
 	PHP_FE(extest_compat_fcall,           arginfo_extest_compat_fcall)
+	PHP_FE(extest_compat_res_new,         arginfo_extest_compat_name)
 	PHPC_FE_END
 };
 
 const zend_function_entry php_extest_compat_obj_funs[] = {
 	PHP_ME(ExtestCompat, test,       NULL,                           ZEND_ACC_PUBLIC)
 	PHP_ME(ExtestCompat, readProp,   NULL,                           ZEND_ACC_PUBLIC)
-	PHP_ME(ExtestCompat, setName,    arginfo_ExtestCompat_setName,   ZEND_ACC_PUBLIC)
+	PHP_ME(ExtestCompat, setName,    arginfo_extest_compat_name,     ZEND_ACC_PUBLIC)
 	PHP_ME(ExtestCompat, getName,    NULL,                           ZEND_ACC_PUBLIC)
 	PHP_ME(ExtestCompat, toArray,    NULL,                           ZEND_ACC_PUBLIC)
 	PHP_ME(ExtestCompat, toArrayAlt, NULL,                           ZEND_ACC_PUBLIC)
@@ -724,6 +725,24 @@ PHP_FUNCTION(extest_compat_fcall)
 	zval_ptr_dtor(&PHPC_FCALL_PARAM_VAL(callback, 1));
 	zval_ptr_dtor(&PHPC_FCALL_PARAM_VAL(callback, 2));
 	zval_ptr_dtor(&retval);
+
+}
+/* }}} */
+
+/* {{{ proto extest_compat_res_new($name)
+   Create a new resource */
+PHP_FUNCTION(extest_compat_res_new)
+{
+	char *name;
+	phpc_str_size_t name_len;
+	extest_compat_res_entry *entry;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len) == FAILURE) {
+		return;
+	}
+
+	entry = emalloc(sizeof(extest_compat_res_entry));
+	entry->name = estrndup(name, name_len);
 
 }
 /* }}} */
