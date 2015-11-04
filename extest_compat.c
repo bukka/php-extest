@@ -736,6 +736,7 @@ PHP_FUNCTION(extest_compat_res_new)
 	char *name;
 	phpc_str_size_t name_len;
 	extest_compat_res_entry *entry;
+	phpc_res_value_t res;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len) == FAILURE) {
 		return;
@@ -744,6 +745,12 @@ PHP_FUNCTION(extest_compat_res_new)
 	entry = emalloc(sizeof(extest_compat_res_entry));
 	entry->name = estrndup(name, name_len);
 
+	res = PHPC_RES_REGISTER(entry, extest_compat_res_index TSRMLS_CC);
+
+	/* these 3 statements do the same - there are here just for testing */
+	PHPC_RES_PZVAL(res, return_value);
+	PHPC_RES_RETVAL(res);
+	PHPC_RES_RETURN(res);
 }
 /* }}} */
 
