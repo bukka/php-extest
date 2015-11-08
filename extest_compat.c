@@ -59,6 +59,7 @@ const zend_function_entry extest_compat_functions[] = {
 	PHP_FE(extest_compat_array_copy,      arginfo_extest_compat_value)
 	PHP_FE(extest_compat_fcall,           arginfo_extest_compat_fcall)
 	PHP_FE(extest_compat_res_new,         arginfo_extest_compat_name)
+	PHP_FE(extest_compat_res_get_name,    NULL)
 	PHPC_FE_END
 };
 
@@ -751,6 +752,23 @@ PHP_FUNCTION(extest_compat_res_new)
 	PHPC_RES_PZVAL(res, return_value);
 	PHPC_RES_RETVAL(res);
 	PHPC_RES_RETURN(res);
+}
+/* }}} */
+
+/* {{{ proto extest_compat_res_get_name()
+   Get resource name */
+PHP_FUNCTION(extest_compat_res_get_name)
+{
+	extest_compat_res_entry *entry;
+	zval *res;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r", &res) == FAILURE) {
+		return;
+	}
+
+	entry = PHPC_RES_FETCH(res, "Extest Compat", extest_compat_res_index);
+
+	PHPC_CSTR_RETURN(entry->name);
 }
 /* }}} */
 
