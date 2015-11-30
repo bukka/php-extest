@@ -32,8 +32,10 @@ PHP_FUNCTION(extest_compat_array_mod);
 PHP_FUNCTION(extest_compat_array_gen);
 PHP_FUNCTION(extest_compat_array_copy);
 PHP_FUNCTION(extest_compat_fcall);
-PHP_FUNCTION(extest_compat_res_new);
-PHP_FUNCTION(extest_compat_res_get_name);
+PHP_FUNCTION(extest_compat_res_info_new);
+PHP_FUNCTION(extest_compat_res_stat_new);
+PHP_FUNCTION(extest_compat_res_info_get_name);
+PHP_FUNCTION(extest_compat_res_dump);
 
 PHP_METHOD(ExtestCompat, test);
 PHP_METHOD(ExtestCompat, readProp);

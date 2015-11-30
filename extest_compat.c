@@ -42,24 +42,34 @@ ZEND_BEGIN_ARG_INFO(arginfo_extest_compat_fcall, 0)
 ZEND_ARG_INFO(0, callback)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO(arginfo_extest_compat_res, 0)
+ZEND_ARG_INFO(0, res)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO(arginfo_extest_compat_name, 0)
 ZEND_ARG_INFO(0, name)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO(arginfo_extest_compat_count, 0)
+ZEND_ARG_INFO(0, count)
+ZEND_END_ARG_INFO()
+
 const zend_function_entry extest_compat_functions[] = {
-	PHP_FE(extest_compat_long,            arginfo_extest_compat_long)
-	PHP_FE(extest_compat_str,             arginfo_extest_compat_value)
-	PHP_FE(extest_compat_cstr,            NULL)
-	PHP_FE(extest_compat_cstrl,           NULL)
-	PHP_FE(extest_compat_cstr_rv,         NULL)
-	PHP_FE(extest_compat_cstrl_rv,        NULL)
-	PHP_FE(extest_compat_array,           arginfo_extest_compat_value)
-	PHP_FE(extest_compat_array_mod,       arginfo_extest_compat_value)
-	PHP_FE(extest_compat_array_gen,       NULL)
-	PHP_FE(extest_compat_array_copy,      arginfo_extest_compat_value)
-	PHP_FE(extest_compat_fcall,           arginfo_extest_compat_fcall)
-	PHP_FE(extest_compat_res_new,         arginfo_extest_compat_name)
-	PHP_FE(extest_compat_res_get_name,    NULL)
+	PHP_FE(extest_compat_long,              arginfo_extest_compat_long)
+	PHP_FE(extest_compat_str,               arginfo_extest_compat_value)
+	PHP_FE(extest_compat_cstr,              NULL)
+	PHP_FE(extest_compat_cstrl,             NULL)
+	PHP_FE(extest_compat_cstr_rv,           NULL)
+	PHP_FE(extest_compat_cstrl_rv,          NULL)
+	PHP_FE(extest_compat_array,             arginfo_extest_compat_value)
+	PHP_FE(extest_compat_array_mod,         arginfo_extest_compat_value)
+	PHP_FE(extest_compat_array_gen,         NULL)
+	PHP_FE(extest_compat_array_copy,        arginfo_extest_compat_value)
+	PHP_FE(extest_compat_fcall,             arginfo_extest_compat_fcall)
+	PHP_FE(extest_compat_res_info_new,      arginfo_extest_compat_name)
+	PHP_FE(extest_compat_res_stat_new,      arginfo_extest_compat_count)
+	PHP_FE(extest_compat_res_info_get_name, arginfo_extest_compat_res)
+	PHP_FE(extest_compat_res_dump,          arginfo_extest_compat_res)
 	PHPC_FE_END
 };
 
@@ -167,17 +177,33 @@ PHPC_OBJ_HANDLER_GET_PROPERTIES(extest_compat)
 	return props;
 }
 
-typedef struct extest_compat_res_entry_struct {
+#define PHP_EXTEST_COMPAT_RES_INFO 1
+#define PHP_EXTEST_COMPAT_RES_STAT 2
+
+typedef struct extest_compat_res_info_entry_struct {
+	int type;
 	char *name;
-} extest_compat_res_entry;
+} extest_compat_res_info_entry;
 
-static int extest_compat_res_index;
+typedef struct extest_compat_res_stat_entry_struct {
+	int type;
+	phpc_long_t count;
+} extest_compat_res_stat_entry;
 
-static void php_extest_compat_res_free(phpc_res_entry_t *rsrc TSRMLS_DC) /* {{{ */
+static int extest_compat_res_info_type;
+static int extest_compat_res_stat_type;
+
+static void php_extest_compat_res_info_free(phpc_res_entry_t *rsrc TSRMLS_DC) /* {{{ */
 {
-	extest_compat_res_entry *entry = (extest_compat_res_entry *) rsrc->ptr;
+	extest_compat_res_info_entry *entry = (extest_compat_res_info_entry *) rsrc->ptr;
 	efree(entry->name);
 	efree(entry);
+}
+/* }}} */
+
+static void php_extest_compat_res_stat_free(phpc_res_entry_t *rsrc TSRMLS_DC) /* {{{ */
+{
+	efree(rsrc->ptr);
 }
 /* }}} */
 
@@ -202,8 +228,11 @@ PHP_MINIT_FUNCTION(extest_compat)
 	zend_declare_property_null(extest_compat_ce,
 			"prop", sizeof("prop")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 
-	extest_compat_res_index = zend_register_list_destructors_ex(
-				php_extest_compat_res_free, NULL, "Extest Compat", module_number);
+	extest_compat_res_info_type = zend_register_list_destructors_ex(
+			php_extest_compat_res_info_free, NULL, "Extest Compat Info", module_number);
+
+	extest_compat_res_stat_type = zend_register_list_destructors_ex(
+			php_extest_compat_res_stat_free, NULL, "Extest Compat Stat", module_number);
 
 	return SUCCESS;
 }
@@ -730,45 +759,100 @@ PHP_FUNCTION(extest_compat_fcall)
 }
 /* }}} */
 
-/* {{{ proto extest_compat_res_new($name)
-   Create a new resource */
-PHP_FUNCTION(extest_compat_res_new)
+/* {{{ proto extest_compat_res_info_new($name)
+   Create a new info resource */
+PHP_FUNCTION(extest_compat_res_info_new)
 {
 	char *name;
 	phpc_str_size_t name_len;
-	extest_compat_res_entry *entry;
+	extest_compat_res_info_entry *entry;
 	phpc_res_value_t res;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &name, &name_len) == FAILURE) {
 		return;
 	}
 
-	entry = emalloc(sizeof(extest_compat_res_entry));
+	entry = emalloc(sizeof(extest_compat_res_info_entry));
+	entry->type = PHP_EXTEST_COMPAT_RES_INFO;
 	entry->name = estrndup(name, name_len);
 
-	res = PHPC_RES_REGISTER(entry, extest_compat_res_index TSRMLS_CC);
+	res = PHPC_RES_REGISTER(entry, extest_compat_res_info_type TSRMLS_CC);
 
-	/* these 3 statements do the same - there are here just for testing */
+	/* the PHPC_RES_PZVAL is outstandin - just for testing */
 	PHPC_RES_PZVAL(res, return_value);
-	PHPC_RES_RETVAL(res);
 	PHPC_RES_RETURN(res);
 }
 /* }}} */
 
-/* {{{ proto extest_compat_res_get_name()
-   Get resource name */
-PHP_FUNCTION(extest_compat_res_get_name)
+/* {{{ proto extest_compat_res_stat_new($name)
+   Create a new stat resource */
+PHP_FUNCTION(extest_compat_res_stat_new)
 {
-	extest_compat_res_entry *entry;
+	phpc_long_t count;
+	extest_compat_res_stat_entry *entry;
+	phpc_res_value_t res;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &count) == FAILURE) {
+		return;
+	}
+
+	entry = emalloc(sizeof(extest_compat_res_stat_entry));
+	entry->type = PHP_EXTEST_COMPAT_RES_STAT;
+	entry->count = count;
+
+	res = PHPC_RES_REGISTER(entry, extest_compat_res_stat_type TSRMLS_CC);
+
+	PHPC_RES_RETVAL(res);
+}
+/* }}} */
+
+/* {{{ proto extest_compat_res_info_get_name($res)
+   Get resource name */
+PHP_FUNCTION(extest_compat_res_info_get_name)
+{
+	extest_compat_res_info_entry *entry;
 	zval *res;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r", &res) == FAILURE) {
 		return;
 	}
 
-	entry = PHPC_RES_FETCH(res, "Extest Compat", extest_compat_res_index);
+	entry = PHPC_RES_FETCH(res, "Extest Compat Info", extest_compat_res_info_type);
 
 	PHPC_CSTR_RETURN(entry->name);
+}
+/* }}} */
+
+/* {{{ proto extest_compat_res_dump($res)
+   Dump extest compat resource */
+PHP_FUNCTION(extest_compat_res_dump)
+{
+	extest_compat_res_info_entry *info_entry;
+	extest_compat_res_stat_entry *stat_entry;
+	int *ptype;
+	zval *res;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r", &res) == FAILURE) {
+		return;
+	}
+
+	ptype = PHPC_RES_FETCH2(res, NULL,
+			extest_compat_res_info_type, extest_compat_res_stat_type);
+
+	switch (*ptype) {
+		case PHP_EXTEST_COMPAT_RES_STAT:
+			stat_entry = (extest_compat_res_stat_entry *) ptype;
+			php_printf("STAT resource (count: %d)\n", stat_entry->count);
+			break;
+		case PHP_EXTEST_COMPAT_RES_INFO:
+			info_entry = (extest_compat_res_info_entry *) ptype;
+			php_printf("INFO resource (name: %s)\n", info_entry->name);
+			break;
+		default:
+			php_printf("Resource type unkonwn %d\n", *ptype);
+			break;
+	}
+
 }
 /* }}} */
 
