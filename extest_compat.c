@@ -776,7 +776,7 @@ PHP_FUNCTION(extest_compat_res_info_new)
 	entry->type = PHP_EXTEST_COMPAT_RES_INFO;
 	entry->name = estrndup(name, name_len);
 
-	res = PHPC_RES_REGISTER(entry, extest_compat_res_info_type TSRMLS_CC);
+	res = PHPC_RES_REGISTER(entry, extest_compat_res_info_type);
 
 	/* the PHPC_RES_PZVAL is outstandin - just for testing */
 	PHPC_RES_PZVAL(res, return_value);
@@ -800,7 +800,7 @@ PHP_FUNCTION(extest_compat_res_stat_new)
 	entry->type = PHP_EXTEST_COMPAT_RES_STAT;
 	entry->count = count;
 
-	res = PHPC_RES_REGISTER(entry, extest_compat_res_stat_type TSRMLS_CC);
+	res = PHPC_RES_REGISTER(entry, extest_compat_res_stat_type);
 
 	PHPC_RES_RETVAL(res);
 }
