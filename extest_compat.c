@@ -54,6 +54,15 @@ ZEND_BEGIN_ARG_INFO(arginfo_extest_compat_count, 0)
 ZEND_ARG_INFO(0, count)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_extest_compat_dump, 0, 0, 0)
+ZEND_ARG_INFO(0, ...)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_extest_compat_sum, 0, 0, 1)
+ZEND_ARG_INFO(0, val1)
+ZEND_ARG_INFO(0, ...)
+ZEND_END_ARG_INFO()
+
 const zend_function_entry extest_compat_functions[] = {
 	PHP_FE(extest_compat_long,              arginfo_extest_compat_long)
 	PHP_FE(extest_compat_str,               arginfo_extest_compat_value)
@@ -70,6 +79,8 @@ const zend_function_entry extest_compat_functions[] = {
 	PHP_FE(extest_compat_res_stat_new,      arginfo_extest_compat_count)
 	PHP_FE(extest_compat_res_info_get_name, arginfo_extest_compat_res)
 	PHP_FE(extest_compat_res_dump,          arginfo_extest_compat_res)
+	PHP_FE(extest_compat_dump,              arginfo_extest_compat_dump)
+	PHP_FE(extest_compat_sum,               arginfo_extest_compat_sum)
 	PHPC_FE_END
 };
 
@@ -852,6 +863,22 @@ PHP_FUNCTION(extest_compat_res_dump)
 			php_printf("Resource type unkonwn %d\n", *ptype);
 			break;
 	}
+
+}
+/* }}} */
+
+/* {{{ proto extest_compat_dump(...)
+   Dump all elements */
+PHP_FUNCTION(extest_compat_dump)
+{
+
+}
+/* }}} */
+
+/* {{{ proto extest_compat_sum($val1, ...)
+   Sum all elements */
+PHP_FUNCTION(extest_compat_sum)
+{
 
 }
 /* }}} */
