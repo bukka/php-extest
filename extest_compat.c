@@ -871,7 +871,13 @@ PHP_FUNCTION(extest_compat_res_dump)
    Dump all elements */
 PHP_FUNCTION(extest_compat_dump)
 {
+	PHPC_ZPP_ARGS_DECLARE();
 
+	PHPC_ZPP_ARGS_LOAD(*);
+
+	PHPC_ZPP_ARGS_LOOP_START() {
+		php_var_dump(PHPC_ZPP_ARGS_CURRENT_PVAL(), 0);
+	} PHPC_ZPP_ARGS_LOOP_END();
 }
 /* }}} */
 
@@ -879,7 +885,16 @@ PHP_FUNCTION(extest_compat_dump)
    Sum all elements */
 PHP_FUNCTION(extest_compat_sum)
 {
+	phpc_long_t total = 0;
+	PHPC_ZPP_ARGS_DECLARE();
 
+	PHPC_ZPP_ARGS_LOAD_EX(+, ZEND_NUM_ARGS(), return);
+
+	PHPC_ZPP_ARGS_LOOP_START() {
+		total += PHPC_LVAL_P(PHPC_ZPP_ARGS_CURRENT_PVAL());
+	} PHPC_ZPP_ARGS_LOOP_END();
+
+	RETURN_LONG(total)
 }
 /* }}} */
 
