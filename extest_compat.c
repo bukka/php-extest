@@ -59,7 +59,7 @@ ZEND_ARG_INFO(0, ...)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_extest_compat_sum, 0, 0, 1)
-ZEND_ARG_INFO(0, val1)
+ZEND_ARG_INFO(0, n)
 ZEND_ARG_INFO(0, ...)
 ZEND_END_ARG_INFO()
 
@@ -875,23 +875,39 @@ PHP_FUNCTION(extest_compat_dump)
 
 	PHPC_ZPP_ARGS_LOAD(*);
 
+	php_printf("Number of items to dump: %d\n", PHPC_ZPP_ARGS_COUNT);
+
 	PHPC_ZPP_ARGS_LOOP_START() {
-		php_var_dump(PHPC_ZPP_ARGS_CURRENT_PVAL(), 0);
+		php_var_dump(PHPC_ZPP_ARGS_GET_CURRENT_PVAL(), 0);
 	} PHPC_ZPP_ARGS_LOOP_END();
 }
 /* }}} */
 
-/* {{{ proto extest_compat_sum($val1, ...)
-   Sum all elements */
+/* {{{ proto extest_compat_sum($n, ...)
+   Sum $n following arguments */
 PHP_FUNCTION(extest_compat_sum)
 {
-	phpc_long_t total = 0;
+	phpc_val *ppv;
+	phpc_long_t n, total = 0;
 	PHPC_ZPP_ARGS_DECLARE();
 
 	PHPC_ZPP_ARGS_LOAD_EX(+, ZEND_NUM_ARGS(), return);
 
-	PHPC_ZPP_ARGS_LOOP_START() {
-		total += PHPC_LVAL_P(PHPC_ZPP_ARGS_CURRENT_PVAL());
+	ppv = PHPC_ZPP_ARGS_GET_PVAL(0);
+	if (PHPC_TYPE_P(ppv) != IS_LONG) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, "First parameter has to be integer");
+		RETURN_FALSE;
+	}
+
+	n = PHPC_LVAL_P(ppv);
+	if (n != PHPC_ZPP_ARGS_COUNT - 1) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid number of arguments");
+		RETURN_FALSE;
+	}
+
+
+	PHPC_ZPP_ARGS_LOOP_START_EX(1) {
+		total += PHPC_LVAL_P(PHPC_ZPP_ARGS_GET_CURRENT_PVAL());
 	} PHPC_ZPP_ARGS_LOOP_END();
 
 	RETURN_LONG(total)
