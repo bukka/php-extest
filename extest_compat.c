@@ -878,7 +878,7 @@ PHP_FUNCTION(extest_compat_dump)
 	php_printf("Number of items to dump: %d\n", PHPC_ZPP_ARGS_COUNT);
 
 	PHPC_ZPP_ARGS_LOOP_START() {
-		php_var_dump(PHPC_ZPP_ARGS_GET_CURRENT_PVAL(), 0);
+		php_var_dump(PHPC_ZPP_ARGS_GET_CURRENT_PVAL(), 0 TSRMLS_CC);
 	} PHPC_ZPP_ARGS_LOOP_END();
 }
 /* }}} */
