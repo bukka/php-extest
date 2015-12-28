@@ -880,6 +880,8 @@ PHP_FUNCTION(extest_compat_dump)
 	PHPC_ZPP_ARGS_LOOP_START() {
 		php_var_dump(PHPC_ZPP_ARGS_GET_CURRENT_PVAL(), 0 TSRMLS_CC);
 	} PHPC_ZPP_ARGS_LOOP_END();
+
+	PHPC_ZPP_ARGS_FREE();
 }
 /* }}} */
 
@@ -895,12 +897,14 @@ PHP_FUNCTION(extest_compat_sum)
 
 	ppv = PHPC_ZPP_ARGS_GET_PVAL(0);
 	if (PHPC_TYPE_P(ppv) != IS_LONG) {
+		PHPC_ZPP_ARGS_FREE();
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "First parameter has to be integer");
 		RETURN_FALSE;
 	}
 
 	n = PHPC_LVAL_P(ppv);
 	if (n != PHPC_ZPP_ARGS_COUNT - 1) {
+		PHPC_ZPP_ARGS_FREE();
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid number of arguments");
 		RETURN_FALSE;
 	}
@@ -909,6 +913,8 @@ PHP_FUNCTION(extest_compat_sum)
 	PHPC_ZPP_ARGS_LOOP_START_EX(1) {
 		total += PHPC_LVAL_P(PHPC_ZPP_ARGS_GET_CURRENT_PVAL());
 	} PHPC_ZPP_ARGS_LOOP_END();
+
+	PHPC_ZPP_ARGS_FREE();
 
 	RETURN_LONG(total)
 }
