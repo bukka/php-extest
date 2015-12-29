@@ -114,7 +114,11 @@ PHPC_OBJ_HANDLER_CREATE_EX(extest_compat)
 	PHPC_OBJ_HANDLER_CREATE_EX_INIT(extest_compat);
 
 	/* custom setup */
-	PHPC_THIS->name = estrdup("hello");
+	if (PHPC_OBJ_HANDLER_CREATE_EX_IS_NEW()) {
+		PHPC_THIS->name = estrdup("hello");
+	} else {
+		PHPC_THIS->name = estrdup("hello clone");
+	}
 	PHPC_THIS->type = 1;
 
 	PHPC_OBJ_HANDLER_CREATE_EX_RETURN(extest_compat);

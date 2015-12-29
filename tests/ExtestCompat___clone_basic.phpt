@@ -21,11 +21,11 @@ object(ExtestCompat)#2 (2) {
   ["prop"]=>
   NULL
   ["name_debug"]=>
-  string(5) "hello"
+  string(11) "hello clone"
 }
 object(ExtestCompat)#3 (2) {
   ["prop"]=>
   NULL
   ["name_debug"]=>
-  string(5) "hello"
+  string(11) "hello clone"
 }
