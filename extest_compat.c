@@ -75,6 +75,7 @@ const zend_function_entry extest_compat_functions[] = {
 	PHP_FE(extest_compat_array_gen,         NULL)
 	PHP_FE(extest_compat_array_copy,        arginfo_extest_compat_value)
 	PHP_FE(extest_compat_fcall,             arginfo_extest_compat_fcall)
+	PHP_FE(extest_compat_fcall_separate,    arginfo_extest_compat_fcall)
 	PHP_FE(extest_compat_res_info_new,      arginfo_extest_compat_name)
 	PHP_FE(extest_compat_res_stat_new,      arginfo_extest_compat_count)
 	PHP_FE(extest_compat_res_info_get_name, arginfo_extest_compat_res)
@@ -769,6 +770,57 @@ PHP_FUNCTION(extest_compat_fcall)
 	zval_ptr_dtor(&PHPC_FCALL_PARAM_VAL(callback, 0));
 	zval_ptr_dtor(&PHPC_FCALL_PARAM_VAL(callback, 1));
 	zval_ptr_dtor(&PHPC_FCALL_PARAM_VAL(callback, 2));
+	zval_ptr_dtor(&retval);
+
+}
+/* }}} */
+
+/* {{{ proto extest_compat_fcall_separate($callback)
+   Call function */
+PHP_FUNCTION(extest_compat_fcall_separate)
+{
+	PHPC_FCALL_PARAMS_DECLARE(callback, 2);
+	zval *z_callback;
+	zend_fcall_info fci;
+	zend_fcall_info_cache fci_cache = empty_fcall_info_cache;
+	phpc_val retval;
+	char *error_msg = NULL;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &z_callback) == FAILURE) {
+		return;
+	}
+
+	if (PHPC_FCALL_INFO_INIT(z_callback, 0, &fci, &fci_cache,	NULL, &error_msg) == FAILURE) {
+		if (error_msg) {
+			php_error_docref(NULL TSRMLS_CC, E_WARNING,
+					"Callback is not a valid callback, %s", error_msg);
+			efree(error_msg);
+		}
+		else {
+			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Callback is not a valid callback");
+		}
+		RETURN_FALSE;
+	}
+
+	PHPC_FCALL_PARAMS_INIT(callback);
+	/* param 0 is int */
+	PHPC_VAL_MAKE(PHPC_FCALL_PARAM_VAL(callback, 0));
+	ZVAL_LONG(PHPC_FCALL_PARAM_PZVAL(callback, 0), 11);
+	/* param 1 is string */
+	PHPC_VAL_MAKE(PHPC_FCALL_PARAM_VAL(callback, 1));
+	PHPC_VAL_CSTR(PHPC_FCALL_PARAM_VAL(callback, 1), "param");
+	/* set fci */
+	PHPC_FCALL_RETVAL(fci, retval);
+	fci.params = PHPC_FCALL_PARAMS_NAME(callback);
+	fci.param_count = 2;
+	fci.no_separation = 0;
+
+	if (zend_call_function(&fci, &fci_cache TSRMLS_CC) != SUCCESS || PHPC_VAL_ISUNDEF(retval)) {
+		php_printf("FCALL failed\n");
+	}
+
+	zval_ptr_dtor(&PHPC_FCALL_PARAM_VAL(callback, 0));
+	zval_ptr_dtor(&PHPC_FCALL_PARAM_VAL(callback, 1));
 	zval_ptr_dtor(&retval);
 
 }
