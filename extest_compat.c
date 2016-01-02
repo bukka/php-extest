@@ -604,8 +604,7 @@ PHP_FUNCTION(extest_compat_array_mod)
 
 		PHPC_VAL_MAKE(pv);
 		PHPC_VAL_CSTR(pv, "index1");
-		PHPC_VAL_TO_PZVAL(pv, pzv);
-		PHPC_HASH_INDEX_UPDATE(aht, 1, pzv);
+		PHPC_HASH_INDEX_UPDATE(aht, 1, PHPC_VAL_CAST_TO_PZVAL(pv));
 	}
 
 	/* cstr */
