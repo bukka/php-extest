@@ -659,6 +659,7 @@ PHP_FUNCTION(extest_compat_array_gen)
 {
 	PHPC_STR_DECLARE(str);
 	phpc_val pv;
+	zval *zv;
 
 	PHPC_ARRAY_INIT(return_value);
 
@@ -671,8 +672,12 @@ PHP_FUNCTION(extest_compat_array_gen)
 	PHPC_ARRAY_ADD_NEXT_INDEX_CSTRL(return_value,
 			"cstrl_next_index_val", sizeof("cstrl_next_index_val")-1);
 	PHPC_VAL_MAKE(pv);
-	PHPC_VAL_CSTR(pv, "zval_next_index_val");
+	PHPC_VAL_CSTR(pv, "val_next_index_val");
 	PHPC_ARRAY_ADD_NEXT_INDEX_VAL(return_value, pv);
+	PHPC_VAL_MAKE(pv);
+	PHPC_VAL_CSTR(pv, "zval_next_index_val");
+	PHPC_VAL_TO_PZVAL(pv, zv);
+	PHPC_ARRAY_ADD_NEXT_INDEX_ZVAL(return_value, zv);
 
 	PHPC_ARRAY_ADD_INDEX_BOOL(return_value, 10, 0);
 	PHPC_ARRAY_ADD_INDEX_LONG(return_value, 11, 4);
@@ -683,8 +688,12 @@ PHP_FUNCTION(extest_compat_array_gen)
 	PHPC_ARRAY_ADD_INDEX_CSTRL(return_value, 15,
 			"cstrl_index_val", sizeof("cstrl_index_val")-1);
 	PHPC_VAL_MAKE(pv);
-	PHPC_VAL_CSTR(pv, "zval_val");
+	PHPC_VAL_CSTR(pv, "val_index_val");
 	PHPC_ARRAY_ADD_INDEX_VAL(return_value, 16, pv);
+	PHPC_VAL_MAKE(pv);
+	PHPC_VAL_CSTR(pv, "zval_index_val");
+	PHPC_VAL_TO_PZVAL(pv, zv);
+	PHPC_ARRAY_ADD_INDEX_ZVAL(return_value, 17, zv);
 
 	PHPC_ARRAY_ADD_ASSOC_BOOL(return_value, "bool", 1);
 	PHPC_ARRAY_ADD_ASSOC_LONG(return_value, "long", 3);
@@ -695,8 +704,12 @@ PHP_FUNCTION(extest_compat_array_gen)
 	PHPC_ARRAY_ADD_ASSOC_CSTRL(return_value, "cstrl",
 			"cstrl_assoc_val", sizeof("cstrl_assoc_val")-1);
 	PHPC_VAL_MAKE(pv);
+	PHPC_VAL_CSTR(pv, "val_assoc_val");
+	PHPC_ARRAY_ADD_ASSOC_VAL(return_value, "val", pv);
+	PHPC_VAL_MAKE(pv);
 	PHPC_VAL_CSTR(pv, "zval_assoc_val");
-	PHPC_ARRAY_ADD_ASSOC_VAL(return_value, "zval", pv);
+	PHPC_VAL_TO_PZVAL(pv, zv);
+	PHPC_ARRAY_ADD_ASSOC_VAL(return_value, "zval", zv);
 
 	PHPC_ARRAY_ADD_ASSOC_BOOL_EX(return_value, "bool_ex", sizeof("bool_ex")-1, 0);
 	PHPC_ARRAY_ADD_ASSOC_LONG_EX(return_value, "long_ex", sizeof("long_ex")-1, 2);
@@ -708,8 +721,12 @@ PHP_FUNCTION(extest_compat_array_gen)
 	PHPC_ARRAY_ADD_ASSOC_CSTRL_EX(return_value, "cstrl_ex", sizeof("cstrl_ex")-1,
 			"cstrl_assoc_val_ex", sizeof("cstrl_assoc_val_ex")-1);
 	PHPC_VAL_MAKE(pv);
+	PHPC_VAL_CSTR(pv, "val_assoc_val_ex");
+	PHPC_ARRAY_ADD_ASSOC_VAL_EX(return_value, "val_ex", sizeof("val_ex")-1, pv);
+	PHPC_VAL_MAKE(pv);
 	PHPC_VAL_CSTR(pv, "zval_assoc_val_ex");
-	PHPC_ARRAY_ADD_ASSOC_VAL_EX(return_value, "zval_ex", sizeof("zval_ex")-1, pv);
+	PHPC_VAL_TO_PZVAL(pv, zv);
+	PHPC_ARRAY_ADD_ASSOC_VAL_EX(return_value, "zval_ex", sizeof("zval_ex")-1, zv);
 }
 /* }}} */
 

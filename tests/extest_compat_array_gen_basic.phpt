@@ -6,7 +6,7 @@ Test function extest_compat_array_gen() by calling it
 var_dump(extest_compat_array_gen());
 ?>
 --EXPECT--
-array(28) {
+array(32) {
   [0]=>
   bool(true)
   [1]=>
@@ -20,6 +20,8 @@ array(28) {
   [5]=>
   string(20) "cstrl_next_index_val"
   [6]=>
+  string(18) "val_next_index_val"
+  [7]=>
   string(19) "zval_next_index_val"
   [10]=>
   bool(false)
@@ -34,7 +36,9 @@ array(28) {
   [15]=>
   string(15) "cstrl_index_val"
   [16]=>
-  string(8) "zval_val"
+  string(13) "val_index_val"
+  [17]=>
+  string(14) "zval_index_val"
   ["bool"]=>
   bool(true)
   ["long"]=>
@@ -47,6 +51,8 @@ array(28) {
   string(14) "cstr_assoc_val"
   ["cstrl"]=>
   string(15) "cstrl_assoc_val"
+  ["val"]=>
+  string(13) "val_assoc_val"
   ["zval"]=>
   string(14) "zval_assoc_val"
   ["bool_ex"]=>
@@ -61,6 +67,8 @@ array(28) {
   string(17) "cstr_assoc_val_ex"
   ["cstrl_ex"]=>
   string(18) "cstrl_assoc_val_ex"
+  ["val_ex"]=>
+  string(16) "val_assoc_val_ex"
   ["zval_ex"]=>
   string(17) "zval_assoc_val_ex"
 }
