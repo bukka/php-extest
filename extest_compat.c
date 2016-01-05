@@ -528,15 +528,21 @@ PHP_FUNCTION(extest_compat_array)
 	php_printf("array with %d elements\n", PHPC_HASH_NUM_ELEMENTS(Z_ARRVAL_P(arr)));
 
 	PHPC_HASH_FOREACH_VAL(Z_ARRVAL_P(arr), ppv) {
+		zval *pzv;
+		PHPC_PVAL_TO_PZVAL(ppv, pzv);
+		php_printf("value type code: %d\n", Z_TYPE_P(pzv));
+
 		/*
 		 * it can be used only with phpc_val as it's ptr ptr in 5 and ptr in 7
 		 * - the same is true for php_debug_zval_dump
 		 */
 		php_var_dump(ppv, 1 TSRMLS_CC);
+
 	} PHPC_HASH_FOREACH_END();
 
 	PHPC_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(arr), key, ppv) {
 		php_printf("key: \"%s\"\n", PHPC_STR_EXISTS(key) ? PHPC_STR_VAL(key) : "");
+		php_printf("value type code: %d\n", Z_TYPE_P(PHPC_PVAL_CAST_TO_PZVAL(ppv)));
 		php_var_dump(ppv, 1 TSRMLS_CC);
 	} PHPC_HASH_FOREACH_END();
 
