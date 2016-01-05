@@ -709,7 +709,7 @@ PHP_FUNCTION(extest_compat_array_gen)
 	PHPC_VAL_MAKE(pv);
 	PHPC_VAL_CSTR(pv, "zval_assoc_val");
 	PHPC_VAL_TO_PZVAL(pv, zv);
-	PHPC_ARRAY_ADD_ASSOC_VAL(return_value, "zval", zv);
+	PHPC_ARRAY_ADD_ASSOC_ZVAL(return_value, "zval", zv);
 
 	PHPC_ARRAY_ADD_ASSOC_BOOL_EX(return_value, "bool_ex", sizeof("bool_ex")-1, 0);
 	PHPC_ARRAY_ADD_ASSOC_LONG_EX(return_value, "long_ex", sizeof("long_ex")-1, 2);
@@ -726,7 +726,7 @@ PHP_FUNCTION(extest_compat_array_gen)
 	PHPC_VAL_MAKE(pv);
 	PHPC_VAL_CSTR(pv, "zval_assoc_val_ex");
 	PHPC_VAL_TO_PZVAL(pv, zv);
-	PHPC_ARRAY_ADD_ASSOC_VAL_EX(return_value, "zval_ex", sizeof("zval_ex")-1, zv);
+	PHPC_ARRAY_ADD_ASSOC_ZVAL_EX(return_value, "zval_ex", sizeof("zval_ex")-1, zv);
 }
 /* }}} */
 
