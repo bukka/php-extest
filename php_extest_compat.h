@@ -36,6 +36,7 @@ PHP_FUNCTION(extest_compat_fcall_separate);
 PHP_FUNCTION(extest_compat_res_info_new);
 PHP_FUNCTION(extest_compat_res_stat_new);
 PHP_FUNCTION(extest_compat_res_info_get_name);
+PHP_FUNCTION(extest_compat_res_delete);
 PHP_FUNCTION(extest_compat_res_dump);
 PHP_FUNCTION(extest_compat_dump);
 PHP_FUNCTION(extest_compat_sum);
