@@ -30,30 +30,30 @@ array with 0 elements
 
 INDEXED
 array with 5 elements
-value type code: 6
+value type code: %d
 string(4) "str1"
-value type code: 4
+value type code: %d
 int(20)
-value type code: 5
+value type code: %d
 float(1.22)
-value type code: 3
+value type code: %d
 bool(true)
-value type code: 1
+value type code: %d
 NULL
 key: ""
-value type code: 6
+value type code: %d
 string(4) "str1"
 key: ""
-value type code: 4
+value type code: %d
 int(20)
 key: ""
-value type code: 5
+value type code: %d
 float(1.22)
 key: ""
-value type code: 3
+value type code: %d
 bool(true)
 key: ""
-value type code: 1
+value type code: %d
 NULL
 index: 0
 string(4) "str1"
@@ -72,30 +72,30 @@ string(4) "str1"
 
 ASSOC
 array with 5 elements
-value type code: 6
+value type code: %d
 string(4) "str1"
-value type code: 4
+value type code: %d
 int(20)
-value type code: 5
+value type code: %d
 float(1.22)
-value type code: 3
+value type code: %d
 bool(true)
-value type code: 1
+value type code: %d
 NULL
 key: "key1"
-value type code: 6
+value type code: %d
 string(4) "str1"
 key: "key2"
-value type code: 4
+value type code: %d
 int(20)
 key: "key3"
-value type code: 5
+value type code: %d
 float(1.22)
 key: "key4"
-value type code: 3
+value type code: %d
 bool(true)
 key: "key5"
-value type code: 1
+value type code: %d
 NULL
 key: "key1"
 string(4) "str1"
