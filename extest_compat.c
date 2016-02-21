@@ -21,8 +21,6 @@
 #include "php_extest_compat.h"
 #include "ext/standard/php_var.h"
 
-#include "phpc/phpc.h"
-
 PHPC_OBJ_STRUCT_BEGIN(extest_compat)
 	char *name;
 	int type;
@@ -63,7 +61,7 @@ ZEND_ARG_INFO(0, n)
 ZEND_ARG_INFO(0, ...)
 ZEND_END_ARG_INFO()
 
-const zend_function_entry extest_compat_functions[] = {
+phpc_function_entry extest_compat_functions[] = {
 	PHP_FE(extest_compat_long,              arginfo_extest_compat_long)
 	PHP_FE(extest_compat_str,               arginfo_extest_compat_value)
 	PHP_FE(extest_compat_cstr,              NULL)
@@ -86,7 +84,7 @@ const zend_function_entry extest_compat_functions[] = {
 	PHPC_FE_END
 };
 
-const zend_function_entry php_extest_compat_obj_funs[] = {
+phpc_function_entry php_extest_compat_obj_funs[] = {
 	PHP_ME(ExtestCompat, test,       NULL,                           ZEND_ACC_PUBLIC)
 	PHP_ME(ExtestCompat, readProp,   NULL,                           ZEND_ACC_PUBLIC)
 	PHP_ME(ExtestCompat, setName,    arginfo_extest_compat_name,     ZEND_ACC_PUBLIC)

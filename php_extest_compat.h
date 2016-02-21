@@ -19,6 +19,8 @@
 #ifndef PHP_EXTEST_COMPAT_H
 #define PHP_EXTEST_COMPAT_H
 
+#include "phpc/phpc.h"
+
 PHP_MINIT_FUNCTION(extest_compat);
 
 PHP_FUNCTION(extest_compat_long);
@@ -48,7 +50,7 @@ PHP_METHOD(ExtestCompat, getName);
 PHP_METHOD(ExtestCompat, toArray);
 PHP_METHOD(ExtestCompat, toArrayAlt);
 
-extern const zend_function_entry extest_compat_functions[];
+extern phpc_function_entry extest_compat_functions[];
 
 #endif	/* PHP_EXTEST_H */
 
