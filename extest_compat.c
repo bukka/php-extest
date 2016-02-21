@@ -324,7 +324,7 @@ PHP_METHOD(ExtestCompat, toArray)
 {
 	PHPC_THIS_DECLARE(extest_compat);
 
-	if (zend_parse_parameters_none()) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "")) {
 		return;
 	}
 
@@ -344,7 +344,7 @@ PHP_METHOD(ExtestCompat, toArrayAlt)
 	phpc_val value;
 	zval *pzv;
 
-	if (zend_parse_parameters_none()) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "")) {
 		return;
 	}
 
