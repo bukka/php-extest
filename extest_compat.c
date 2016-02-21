@@ -150,6 +150,7 @@ PHPC_OBJ_HANDLER_COMPARE(extest_compat)
 	return strcmp(PHPC_THIS->name, PHPC_THAT->name);
 }
 
+#if PHPC_OBJ_HAS_HANDLER_GET_GC
 PHPC_OBJ_HANDLER_GET_GC(extest_compat)
 {
 	*PHPC_GC_TABLE = NULL;
@@ -157,7 +158,9 @@ PHPC_OBJ_HANDLER_GET_GC(extest_compat)
 
 	return zend_std_get_properties(PHPC_SELF TSRMLS_CC);
 }
+#endif
 
+#if PHPC_OBJ_HAS_HANDLER_GET_DEBUG_INFO
 PHPC_OBJ_HANDLER_GET_DEBUG_INFO(extest_compat)
 {
 	HashTable *props;
@@ -176,7 +179,9 @@ PHPC_OBJ_HANDLER_GET_DEBUG_INFO(extest_compat)
 
 	return props;
 }
+#endif
 
+#if PHPC_OBJ_HAS_HANDLER_GET_PROPERTIES
 PHPC_OBJ_HANDLER_GET_PROPERTIES(extest_compat)
 {
 	HashTable *props;
@@ -193,6 +198,7 @@ PHPC_OBJ_HANDLER_GET_PROPERTIES(extest_compat)
 
 	return props;
 }
+#endif
 
 #define PHP_EXTEST_COMPAT_RES_INFO 1
 #define PHP_EXTEST_COMPAT_RES_STAT 2
