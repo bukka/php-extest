@@ -532,6 +532,15 @@ PHP_FUNCTION(extest_compat_array)
 
 	php_printf("array with %d elements\n", PHPC_HASH_NUM_ELEMENTS(Z_ARRVAL_P(arr)));
 
+	PHPC_HASH_FOREACH_KEY(Z_ARRVAL_P(arr), idx, key) {
+		if (PHPC_STR_EXISTS(key)) {
+			php_printf("key: \"%s\" (len: %"PHPC_STR_LEN_FMT")\n",
+					PHPC_STR_VAL(key), PHPC_STR_LEN(key));
+		} else {
+			php_printf("index: %lu\n", idx);
+		}
+	} PHPC_HASH_FOREACH_END();
+
 	PHPC_HASH_FOREACH_VAL(Z_ARRVAL_P(arr), ppv) {
 		zval *pzv;
 		PHPC_PVAL_TO_PZVAL(ppv, pzv);

@@ -30,6 +30,11 @@ array with 0 elements
 
 INDEXED
 array with 5 elements
+index: 0
+index: 1
+index: 2
+index: 3
+index: 4
 value type code: %d
 string(4) "str1"
 value type code: %d
@@ -72,6 +77,11 @@ string(4) "str1"
 
 ASSOC
 array with 5 elements
+key: "key1" (len: 4)
+key: "key2" (len: 4)
+key: "key3" (len: 4)
+key: "key4" (len: 4)
+key: "key5" (len: 4)
 value type code: %d
 string(4) "str1"
 value type code: %d
