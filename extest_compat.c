@@ -936,7 +936,7 @@ PHP_FUNCTION(extest_compat_res_delete)
 		return;
 	}
 
-	RETURN_BOOL(PHPC_RES_DELETE(res) == SUCCESS);
+	RETURN_BOOL(PHPC_RES_CLOSE(res) == SUCCESS);
 }
 /* }}} */
 
