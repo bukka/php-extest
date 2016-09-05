@@ -522,9 +522,9 @@ PHP_FUNCTION(extest_compat_array)
 	zval *arr;
 	phpc_ulong_t idx;
 	phpc_val *ppv;
+	HashPosition pos;
 	PHPC_STR_DECLARE(key);
 	PHPC_STR_LEN_UNUSED(key);
-	HashPosition pos;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &arr) == FAILURE) {
 		return;
@@ -604,9 +604,9 @@ PHP_FUNCTION(extest_compat_array_mod)
 {
 	zval *arr, *pzv;
 	phpc_val *ppv, pv;
+	HashTable *aht;
 	PHPC_STR_DECLARE(key);
 	PHPC_STR_LEN_UNUSED(key);
-	HashTable *aht;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a", &arr) == FAILURE) {
 		return;
