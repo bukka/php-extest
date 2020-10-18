@@ -154,7 +154,7 @@ PHPC_OBJ_HANDLER_GET_GC(extest_compat)
 	*PHPC_GC_TABLE = NULL;
 	*PHPC_GC_N = 0;
 
-	return zend_std_get_properties(PHPC_SELF TSRMLS_CC);
+	return PHPC_OBJ_STD_GET_PROPERTIES(PHPC_SELF);
 }
 #endif
 
@@ -168,7 +168,7 @@ PHPC_OBJ_HANDLER_GET_DEBUG_INFO(extest_compat)
 
 	*PHPC_DEBUG_INFO_IS_TEMP = 0;
 
-	props = zend_std_get_properties(PHPC_SELF TSRMLS_CC);
+	props = PHPC_OBJ_STD_GET_PROPERTIES(PHPC_SELF);
 
 	PHPC_VAL_MAKE(value);
 	PHPC_VAL_CSTR(value, PHPC_THIS->name);
@@ -187,7 +187,7 @@ PHPC_OBJ_HANDLER_GET_PROPERTIES(extest_compat)
 	zval *pzv;
 	PHPC_THIS_DECLARE_AND_FETCH_FROM_SELF(extest_compat);
 
-	props = zend_std_get_properties(PHPC_SELF TSRMLS_CC);
+	props = PHPC_OBJ_STD_GET_PROPERTIES(PHPC_SELF);
 
 	PHPC_VAL_MAKE(value);
 	PHPC_VAL_CSTR(value, PHPC_THIS->name);
