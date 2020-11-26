@@ -1018,8 +1018,9 @@ PHP_FUNCTION(extest_compat_sum)
 
 	PHPC_ZPP_ARGS_FREE();
 
-	RETURN_LONG(total)
+	RETURN_LONG(total);
 }
+
 /* }}} */
 
 /*
