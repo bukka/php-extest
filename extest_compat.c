@@ -955,7 +955,7 @@ PHP_FUNCTION(extest_compat_res_dump)
 	switch (*ptype) {
 		case PHP_EXTEST_COMPAT_RES_STAT:
 			stat_entry = (extest_compat_res_stat_entry *) ptype;
-			php_printf("STAT resource (count: %d)\n", stat_entry->count);
+			php_printf("STAT resource (count: %d)\n", (int) stat_entry->count);
 			break;
 		case PHP_EXTEST_COMPAT_RES_INFO:
 			info_entry = (extest_compat_res_info_entry *) ptype;
