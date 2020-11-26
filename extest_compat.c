@@ -278,7 +278,7 @@ PHP_METHOD(ExtestCompat, readProp)
 	prop = PHPC_READ_PROPERTY(extest_compat_ce, getThis(), "prop", sizeof("prop")-1, 1);
 
 	if (Z_TYPE_P(prop) != IS_STRING) {
-		zend_update_property_string(extest_compat_ce, getThis(),
+		zend_update_property_string(extest_compat_ce, PHPC_OBJ_FOR_PROP(getThis()),
 			"prop", sizeof("prop")-1, "unknown" TSRMLS_CC);
 
 		PHPC_CSTR_RETURN("unknown");
@@ -795,9 +795,7 @@ PHP_FUNCTION(extest_compat_fcall)
 	PHPC_VAL_CSTR(PHPC_FCALL_PARAM_VAL(callback, 2), "param");
 	/* set fci */
 	PHPC_FCALL_RETVAL(fci, retval);
-	fci.params = PHPC_FCALL_PARAMS_NAME(callback);
-	fci.param_count = 3;
-	fci.no_separation = 1;
+	PHPC_FCALL_FCI_INIT(fci, callback, 3, 1);
 
 	if (zend_call_function(&fci, &fci_cache TSRMLS_CC) != SUCCESS || PHPC_VAL_ISUNDEF(retval)) {
 		php_printf("FCALL failed\n");
@@ -847,9 +845,7 @@ PHP_FUNCTION(extest_compat_fcall_separate)
 	PHPC_VAL_CSTR(PHPC_FCALL_PARAM_VAL(callback, 1), "param");
 	/* set fci */
 	PHPC_FCALL_RETVAL(fci, retval);
-	fci.params = PHPC_FCALL_PARAMS_NAME(callback);
-	fci.param_count = 2;
-	fci.no_separation = 0;
+	PHPC_FCALL_FCI_INIT(fci, callback, 2, 0);
 
 	if (zend_call_function(&fci, &fci_cache TSRMLS_CC) != SUCCESS || PHPC_VAL_ISUNDEF(retval)) {
 		php_printf("FCALL failed\n");
